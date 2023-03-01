@@ -1,20 +1,7 @@
 import "./SearchBar.css";
 import React from "react";
-import axios from "axios";
 
-function search(e) {
-  let requete =
-    "https://www.googleapis.com/books/v1/volumes?q=inauthor:" + e.value;
-  axios
-    .get(requete)
-    .then((response) => {
-      //console.log(response.data);
-      return response.data;
-    })
-    .catch((error) => {
-      console.log("Erreur serveur" + error);
-    });
-}
+// Composant du header et de la barre de recherche
 
 export default class SearchBar extends React.Component {
   constructor(props) {
@@ -22,8 +9,9 @@ export default class SearchBar extends React.Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
+  // Permet la récupération de ce qui est entré et le remonte au parent a chaque fois que celui-ci change
   handleChange(e) {
-    console.log(search(e.target));
+    this.props.SearchChange(e.target.value, this.props.page);
   }
 
   render() {

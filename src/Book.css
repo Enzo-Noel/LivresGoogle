@@ -1,0 +1,45 @@
+.Book {
+  display: flex;
+  justify-content: space-evenly;
+  height: 200px;
+  width: 33%;
+  padding-top: 5px;
+  padding-bottom: 5px;
+
+  /* border: 1px;
+  border-style: solid; */
+}
+
+.thumbnail {
+  width: 150px;
+  height: auto;
+}
+
+.text {
+  width: 50%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text,
+.text * {
+  /* border: 1px;
+  border-style: solid; */
+}
+
+.title {
+  font-size: larger;
+  padding-left: 10px;
+  padding-right: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.description {
+  white-space: normal;
+
+  padding: 10px;
+  height: 100%;
+}
