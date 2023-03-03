@@ -3,10 +3,6 @@ import React from "react";
 
 // composant du livre
 export default class Book extends React.Component {
-  // constructor(props) {
-  //   super(props);
-  //   // Les données du livre sont récupérées dans les props
-  // }
   // Rendu du livre
   // le rendu du livre est composé de l'image, du titre,
   // de la description et du lien vers la lecture en ligne

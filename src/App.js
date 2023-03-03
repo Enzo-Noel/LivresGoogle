@@ -25,6 +25,7 @@ export default class App extends React.Component {
   // Ici j'éffectue la recherche en fonction de la suite de caractere entrée
   // et dependant de la page
   search(newSearch, newPage, newNbBooks) {
+    console.log("search : " + newSearch + " page :" + newPage);
     // Si il y a une suite de caractere, on effectue la recherche
     if (this.state.emptyString.test(newSearch) === false) {
       let page = newPage;
@@ -75,6 +76,7 @@ export default class App extends React.Component {
     const data = this.state.data;
     const page = this.state.page;
     const nbBooks = this.state.nbBooks;
+    console.log(data);
     let hadData = false;
     // Si il y a des données, on le signale
     if (data.totalItems > 0) {
