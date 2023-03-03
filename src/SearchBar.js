@@ -6,23 +6,47 @@ import React from "react";
 export default class SearchBar extends React.Component {
   constructor(props) {
     super(props);
-    this.handleChange = this.handleChange.bind(this);
+    this.handleSearch = this.handleSearch.bind(this);
+    this.handleNbBooks = this.handleNbBooks.bind(this);
   }
 
   // Permet la récupération de ce qui est entré et le remonte au parent a chaque fois que celui-ci change
-  handleChange(e) {
-    this.props.SearchChange(e.target.value, this.props.page);
+  handleSearch(e) {
+    this.props.SearchChange(
+      e.target.value,
+      this.props.page,
+      this.props.nbBooks
+    );
+  }
+
+  handleNbBooks(e) {
+    this.props.NbBooksChange(e.target.value);
   }
 
   render() {
     return (
       <div className="SearchBar">
         <h1>API de recherche Google</h1>
-        <input
-          className="searchInput"
-          type="text"
-          onChange={this.handleChange}
-        />
+        <div>
+          <label htmlFor="search">Search by author</label>
+          <input
+            name="search"
+            className="searchInput"
+            type="text"
+            onChange={this.handleSearch}
+          />
+          <input
+            name="nbSearch"
+            className="nbBooksInput"
+            type="number"
+            onChange={this.handleNbBooks}
+            value={this.props.nbBooks}
+            step="1"
+            min="1"
+            max="40"
+          />
+          <label htmlFor="nbSearch">Number of books</label>
+        </div>
       </div>
     );
   }

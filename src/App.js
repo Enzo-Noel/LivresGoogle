@@ -12,29 +12,35 @@ export default class App extends React.Component {
     super(props);
     this.search = this.search.bind(this);
     this.changePage = this.changePage.bind(this);
+    this.changeNbBooks = this.changeNbBooks.bind(this);
     this.state = {
       research: "", // La recherche
       data: [], // Les données
       page: 0, // La page
+      nbBooks: 10, // Le nombre de livres
+      emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
     };
   }
 
   // Ici j'éffectue la recherche en fonction de la suite de caractere entrée
   // et dependant de la page
-  search(newSearch, newPage) {
+  search(newSearch, newPage, newNbBooks) {
     // Si il y a une suite de caractere, on effectue la recherche
-    if (newSearch !== "") {
+    if (this.state.emptyString.test(newSearch) === false) {
       let page = newPage;
       // Si la recherche a changé, on revient à la page 0
       if (newSearch !== this.state.research) {
         page = 0;
-        this.setState({ page: 0 });
+        this.setState({ page: page });
       }
       let requete =
         "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
         newSearch +
         "&startIndex=" +
-        page * 10;
+        page * newNbBooks +
+        "&maxResults=" +
+        newNbBooks;
+      console.log(requete);
       axios
         .get(requete)
         .then((response) => {
@@ -45,8 +51,14 @@ export default class App extends React.Component {
           console.log("Erreur serveur" + error);
         });
     } else {
+      this.setState({ research: newSearch });
       this.setState({ data: [] });
     }
+  }
+
+  changeNbBooks(newNbBooks) {
+    this.setState({ nbBooks: newNbBooks });
+    this.search(this.state.research, this.state.page, newNbBooks);
   }
 
   // Ici j'éffectue le changement de page
@@ -55,40 +67,66 @@ export default class App extends React.Component {
   // contourner en passant la page d'une autre façon.
   changePage(newPage) {
     this.setState({ page: newPage });
-    this.search(this.state.research, newPage);
+    this.search(this.state.research, newPage, this.state.nbBooks);
   }
 
   render() {
     const research = this.state.research;
     const data = this.state.data;
     const page = this.state.page;
+    const nbBooks = this.state.nbBooks;
     let hadData = false;
     // Si il y a des données, on le signale
     if (data.totalItems > 0) {
       hadData = true;
     }
     // Si il y a des données pour la recherche, on affiche la barre de recherche, les livres et le footer
-    if (hadData) {
-      return (
-        <div className="App">
-          <SearchBar data={data} page={page} SearchChange={this.search} />
-          <BookArea data={data} research={research} />
-          <Footer data={data} page={page} PageChange={this.changePage} />
-        </div>
-      );
-    }
-    // Si il y a une recherche mais pas de données, on affiche la barre de recherche et un message d'erreur
-    else if (research !== "") {
-      return (
-        <div className="App">
-          <SearchBar data={data} page={page} SearchChange={this.search} />
-          <BookArea data={data} research={research} />
-        </div>
-      );
+    if (this.state.emptyString.test(research) === false) {
+      if (hadData && nbBooks > 0 && nbBooks < 41) {
+        return (
+          <div className="App">
+            <SearchBar
+              data={data}
+              page={page}
+              nbBooks={nbBooks}
+              SearchChange={this.search}
+              NbBooksChange={this.changeNbBooks}
+            />
+            <BookArea data={data} research={research} nbBooks={nbBooks} />
+            <Footer
+              data={data}
+              page={page}
+              nbBooks={nbBooks}
+              PageChange={this.changePage}
+            />
+          </div>
+        );
+      }
+      // Si il y a une recherche mais pas de données, on affiche la barre de recherche et un message d'erreur
+      else if (!hadData) {
+        return (
+          <div className="App">
+            <SearchBar
+              data={data}
+              page={page}
+              nbBooks={nbBooks}
+              SearchChange={this.search}
+              NbBooksChange={this.changeNbBooks}
+            />
+            <BookArea data={data} research={research} nbBooks={nbBooks} />
+          </div>
+        );
+      }
     }
     return (
       <div className="App">
-        <SearchBar data={data} page={page} SearchChange={this.search} />
+        <SearchBar
+          data={data}
+          page={page}
+          nbBooks={nbBooks}
+          SearchChange={this.search}
+          NbBooksChange={this.changeNbBooks}
+        />
       </div>
     );
   }

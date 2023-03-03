@@ -21,7 +21,7 @@ export default class Footer extends React.Component {
   handlePlus() {
     const page = this.props.page;
     const data = this.props.data;
-    if (data.totalItems > (page + 1) * 10) {
+    if (data.totalItems > (page + 1) * this.props.nbBooks) {
       this.props.PageChange(page + 1);
     }
   }
@@ -29,16 +29,16 @@ export default class Footer extends React.Component {
   render() {
     const page = this.props.page;
     const data = this.props.data;
-    let pagination = (page + 1) * 10;
-    let leftBorder = pagination - 10;
+    let pagination = (page + 1) * this.props.nbBooks;
+    let leftBorder = pagination - this.props.nbBooks;
     let rightBorder = pagination;
 
     // Si on est sur la première page, on affiche les 10 premiers résultats
-    if (page == 0) {
+    if (page === 0) {
       leftBorder = page + 1;
     }
     // Si on est sur la dernière page, on affiche le nombre de résultats restants
-    if (data.totalItems < (page + 1) * 10) {
+    if (data.totalItems < (page + 1) * this.props.nbBooks) {
       rightBorder = data.totalItems;
     }
 
