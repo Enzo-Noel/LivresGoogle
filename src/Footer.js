@@ -27,6 +27,16 @@ export default class Footer extends React.Component {
   }
 
   render() {
+    let prevBtn = (
+      <h2 className="btn" onClick={this.handleMinus}>
+        Précedent
+      </h2>
+    );
+    let nextBtn = (
+      <h2 className="btn" onClick={this.handlePlus}>
+        Suivant
+      </h2>
+    );
     const page = this.props.page;
     const data = this.props.data;
     let pagination = (page + 1) * this.props.nbBooks;
@@ -36,10 +46,23 @@ export default class Footer extends React.Component {
     // Si on est sur la première page, on affiche les 10 premiers résultats
     if (page === 0) {
       leftBorder = page + 1;
+      prevBtn = (
+        <h2 className="btn hidden" onClick={this.handleMinus}>
+          Précedent
+        </h2>
+      );
     }
     // Si on est sur la dernière page, on affiche le nombre de résultats restants
-    if (data.totalItems < (page + 1) * this.props.nbBooks) {
+    if (
+      data.totalItems < (page + 1) * this.props.nbBooks ||
+      pagination === data.totalItems
+    ) {
       rightBorder = data.totalItems;
+      nextBtn = (
+        <h2 className="btn hidden" onClick={this.handlePlus}>
+          Suivant
+        </h2>
+      );
     }
 
     // On crée la pagination correctement en fonction des deux conditions précédentes
@@ -50,13 +73,9 @@ export default class Footer extends React.Component {
     );
     return (
       <div className="Footer">
-        <h2 className="btn" onClick={this.handleMinus}>
-          Prev
-        </h2>
+        {prevBtn}
         {paginations}
-        <h2 className="btn" onClick={this.handlePlus}>
-          Next
-        </h2>
+        {nextBtn}
       </div>
     );
   }

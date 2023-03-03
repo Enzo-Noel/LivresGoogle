@@ -13,13 +13,15 @@ export default class App extends React.Component {
     this.search = this.search.bind(this);
     this.changePage = this.changePage.bind(this);
     this.changeNbBooks = this.changeNbBooks.bind(this);
+    this.reset = this.reset.bind(this);
     this.state = {
       research: "", // La recherche
       data: [], // Les données
       page: 0, // La page
-      nbBooks: 10, // Le nombre de livres
+      nbBooks: 10, // Le nombre de livres de base
       emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
       searchPromise: undefined, // Une promesse pour la recherche
+      error: false,
     };
   }
 
@@ -34,7 +36,7 @@ export default class App extends React.Component {
         page = 0;
         this.setState({ page: page });
       }
-      let newSearchPromise = new Promise((resolve, reject) => {
+      const newSearchPromise = new Promise((resolve) => {
         let requete =
           "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
           newSearch +
@@ -45,36 +47,45 @@ export default class App extends React.Component {
         axios
           .get(requete)
           .then((response) => {
-            this.setState({ research: newSearch });
+            resolve();
             this.setState({ data: response.data });
-            resolve(response.data);
-            this.setState({ searchPromise: undefined });
-            console.log("fin de la promesse " + newSearchPromise);
+            this.setState({ research: newSearch });
           })
           .catch((error) => {
-            reject(console.log("Erreur serveur" + error));
+            this.setState({ error: true });
+            this.reset(newSearch);
+            console.log(error);
           });
       });
-      console.log("debut de la promesse " + newSearchPromise);
       this.setState({ searchPromise: newSearchPromise });
     } else {
-      console.log("Promesse en cours " + this.searchPromise);
-      if (this.searchPromise !== undefined) {
-        console.log("Annulation de la recherche");
-        this.searchPromise.then((data) => {
-          this.setState({ research: newSearch });
-          this.setState({ data: [] });
+      // Si il y a une promesse en cours, on attend qu'elle soit terminée puis on vide les données
+      if (this.state.searchPromise !== undefined) {
+        this.state.searchPromise.then(() => {
+          this.reset(newSearch);
+          this.setState({ searchPromise: undefined });
         });
       } else {
-        this.setState({ research: newSearch });
-        this.setState({ data: [] });
+        // Sinon on vide les données
+        this.reset(newSearch);
       }
     }
   }
 
+  reset(search) {
+    this.setState({ research: search });
+    this.setState({ data: [] });
+  }
+
   changeNbBooks(newNbBooks) {
     this.setState({ nbBooks: newNbBooks });
-    this.search(this.state.research, this.state.page, newNbBooks);
+    let correctPage = this.state.page;
+    if (newNbBooks * this.state.page >= this.state.data.totalItems) {
+      correctPage = this.state.data.totalItems / newNbBooks - 1;
+      correctPage = Math.ceil(correctPage);
+      this.setState({ page: correctPage });
+    }
+    this.search(this.state.research, correctPage, newNbBooks);
   }
 
   // Ici j'éffectue le changement de page
@@ -91,30 +102,49 @@ export default class App extends React.Component {
     const data = this.state.data;
     const page = this.state.page;
     const nbBooks = this.state.nbBooks;
+    const searchPromise = this.state.searchPromise;
+    const error = this.state.error;
+
     let hadData = false;
     // Si il y a des données, on le signale
     if (data.totalItems > 0) {
       hadData = true;
     }
+
+    const searchBar = (
+      <SearchBar
+        data={data}
+        page={page}
+        nbBooks={nbBooks}
+        SearchChange={this.search}
+        NbBooksChange={this.changeNbBooks}
+      />
+    );
+    const bookArea = (
+      <BookArea
+        data={data}
+        research={research}
+        searchPromise={searchPromise}
+        error={error}
+        nbBooks={nbBooks}
+      />
+    );
+    const footer = (
+      <Footer
+        data={data}
+        page={page}
+        nbBooks={nbBooks}
+        PageChange={this.changePage}
+      />
+    );
     // Si il y a des données pour la recherche, on affiche la barre de recherche, les livres et le footer
     if (this.state.emptyString.test(research) === false) {
       if (hadData && nbBooks > 0 && nbBooks < 41) {
         return (
           <div className="App">
-            <SearchBar
-              data={data}
-              page={page}
-              nbBooks={nbBooks}
-              SearchChange={this.search}
-              NbBooksChange={this.changeNbBooks}
-            />
-            <BookArea data={data} research={research} nbBooks={nbBooks} />
-            <Footer
-              data={data}
-              page={page}
-              nbBooks={nbBooks}
-              PageChange={this.changePage}
-            />
+            {searchBar}
+            {bookArea}
+            {footer}
           </div>
         );
       }
@@ -122,28 +152,12 @@ export default class App extends React.Component {
       else if (!hadData) {
         return (
           <div className="App">
-            <SearchBar
-              data={data}
-              page={page}
-              nbBooks={nbBooks}
-              SearchChange={this.search}
-              NbBooksChange={this.changeNbBooks}
-            />
-            <BookArea data={data} research={research} nbBooks={nbBooks} />
+            {searchBar}
+            {bookArea}
           </div>
         );
       }
     }
-    return (
-      <div className="App">
-        <SearchBar
-          data={data}
-          page={page}
-          nbBooks={nbBooks}
-          SearchChange={this.search}
-          NbBooksChange={this.changeNbBooks}
-        />
-      </div>
-    );
+    return <div className="App">{searchBar}</div>;
   }
 }

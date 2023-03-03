@@ -28,7 +28,7 @@ export default class SearchBar extends React.Component {
       <div className="SearchBar">
         <h1>API de recherche Google</h1>
         <div>
-          <label htmlFor="search">Search by author</label>
+          <label htmlFor="search">Recherche par auteur</label>
           <input
             name="search"
             className="searchInput"
@@ -45,7 +45,7 @@ export default class SearchBar extends React.Component {
             min="1"
             max="40"
           />
-          <label htmlFor="nbSearch">Number of books</label>
+          <label htmlFor="nbSearch">Nombre de livres</label>
         </div>
       </div>
     );
