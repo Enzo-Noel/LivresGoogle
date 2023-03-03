@@ -22,11 +22,11 @@
   text-overflow: ellipsis;
 }
 
-.text,
+/* .text,
 .text * {
-  /* border: 1px;
-  border-style: solid; */
-}
+  border: 1px;
+  border-style: solid; 
+} */
 
 .title {
   font-size: larger;
