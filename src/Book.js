@@ -9,22 +9,23 @@ export default class Book extends React.Component {
 
   render() {
     const title = this.props.book.volumeInfo.title;
+    const volumeInfo = this.props.book.volumeInfo;
 
-    let description = this.props.book.volumeInfo.description;
+    let description = volumeInfo.description;
     // Si il n'y a pas de description, on affiche "pas de description"
     if (description === undefined) {
       description = "pas de description";
     }
 
-    const webReaderLink = this.props.book.accessInfo.webReaderLink;
-    const alt = this.props.book.volumeInfo.title + " image";
+    const previewLink = volumeInfo.previewLink;
+    const alt = volumeInfo.title + " image";
 
     let image = "";
     // Si il n'y a pas d'image, on affiche une image par défaut
-    if (this.props.book.volumeInfo.imageLinks === undefined) {
+    if (volumeInfo.imageLinks === undefined) {
       image = "https://via.placeholder.com/150";
     } else {
-      image = this.props.book.volumeInfo.imageLinks.thumbnail;
+      image = volumeInfo.imageLinks.thumbnail;
     }
 
     return (
@@ -32,7 +33,7 @@ export default class Book extends React.Component {
         <img className="thumbnail" src={image} alt={alt} />
         <div className="text">
           <h1 className="title">
-            <a href={webReaderLink}>{title}</a>
+            <a href={previewLink}>{title}</a>
           </h1>
           <p className="description">{description}</p>
         </div>

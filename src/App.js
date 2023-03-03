@@ -19,6 +19,7 @@ export default class App extends React.Component {
       page: 0, // La page
       nbBooks: 10, // Le nombre de livres
       emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
+      searchPromise: undefined, // Une promesse pour la recherche
     };
   }
 
@@ -33,25 +34,41 @@ export default class App extends React.Component {
         page = 0;
         this.setState({ page: page });
       }
-      let requete =
-        "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
-        newSearch +
-        "&startIndex=" +
-        page * newNbBooks +
-        "&maxResults=" +
-        newNbBooks;
-      axios
-        .get(requete)
-        .then((response) => {
-          this.setState({ research: newSearch });
-          this.setState({ data: response.data });
-        })
-        .catch((error) => {
-          console.log("Erreur serveur" + error);
-        });
+      let newSearchPromise = new Promise((resolve, reject) => {
+        let requete =
+          "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
+          newSearch +
+          "&startIndex=" +
+          page * newNbBooks +
+          "&maxResults=" +
+          newNbBooks;
+        axios
+          .get(requete)
+          .then((response) => {
+            this.setState({ research: newSearch });
+            this.setState({ data: response.data });
+            resolve(response.data);
+            this.setState({ searchPromise: undefined });
+            console.log("fin de la promesse " + newSearchPromise);
+          })
+          .catch((error) => {
+            reject(console.log("Erreur serveur" + error));
+          });
+      });
+      console.log("debut de la promesse " + newSearchPromise);
+      this.setState({ searchPromise: newSearchPromise });
     } else {
-      this.setState({ research: newSearch });
-      this.setState({ data: [] });
+      console.log("Promesse en cours " + this.searchPromise);
+      if (this.searchPromise !== undefined) {
+        console.log("Annulation de la recherche");
+        this.searchPromise.then((data) => {
+          this.setState({ research: newSearch });
+          this.setState({ data: [] });
+        });
+      } else {
+        this.setState({ research: newSearch });
+        this.setState({ data: [] });
+      }
     }
   }
 
