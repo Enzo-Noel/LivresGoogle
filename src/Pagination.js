@@ -1,8 +1,8 @@
-import "./Footer.css";
+import "./Pagination.css";
 import React from "react";
 
 // Composant du footer et de la pagination
-export default class Footer extends React.Component {
+export default class Pagination extends React.Component {
   constructor(props) {
     super(props);
     this.handleMinus = this.handleMinus.bind(this);
@@ -28,53 +28,57 @@ export default class Footer extends React.Component {
 
   render() {
     let prevBtn = (
-      <h2 className="btn" onClick={this.handleMinus}>
+      <h2 className="button" onClick={this.handleMinus}>
         Précedent
       </h2>
     );
     let nextBtn = (
-      <h2 className="btn" onClick={this.handlePlus}>
+      <h2 className="button" onClick={this.handlePlus}>
         Suivant
       </h2>
     );
     const page = this.props.page;
     const data = this.props.data;
-    let pagination = (page + 1) * this.props.nbBooks;
-    let leftBorder = pagination - this.props.nbBooks;
-    let rightBorder = pagination;
+    const nbBooks = this.props.nbBooks;
+    let nbBooksDisplay = (page + 1) * nbBooks;
+    let leftBorder = nbBooksDisplay - nbBooks;
+    let rightBorder = nbBooksDisplay;
 
     // Si on est sur la première page, on affiche les 10 premiers résultats
     if (page === 0) {
       leftBorder = page + 1;
       prevBtn = (
-        <h2 className="btn hidden" onClick={this.handleMinus}>
+        <h2 className="button hidden" onClick={this.handleMinus}>
           Précedent
         </h2>
       );
     }
     // Si on est sur la dernière page, on affiche le nombre de résultats restants
     if (
-      data.totalItems < (page + 1) * this.props.nbBooks ||
-      pagination === data.totalItems
+      data.totalItems < (page + 1) * nbBooks ||
+      nbBooksDisplay === data.totalItems
     ) {
       rightBorder = data.totalItems;
       nextBtn = (
-        <h2 className="btn hidden" onClick={this.handlePlus}>
+        <h2 className="button hidden" onClick={this.handlePlus}>
           Suivant
         </h2>
       );
     }
 
     // On crée la pagination correctement en fonction des deux conditions précédentes
-    let paginations = (
-      <h2>
-        [{leftBorder} ... {rightBorder}]/{data.totalItems}
-      </h2>
+    let whereWeAre = (
+      <div>
+        <h2>
+          {leftBorder} ... {rightBorder} / {data.totalItems} Livres - {page + 1}{" "}
+          / {Math.ceil(data.totalItems / nbBooks)} Pages
+        </h2>
+      </div>
     );
     return (
-      <div className="Footer">
+      <div className="Pagination">
         {prevBtn}
-        {paginations}
+        {whereWeAre}
         {nextBtn}
       </div>
     );
