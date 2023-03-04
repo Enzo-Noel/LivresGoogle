@@ -1,0 +1,19 @@
+.Pagination {
+  display: flex;
+  justify-content: space-evenly;
+  padding: 2rem 0 2rem 0;
+}
+
+.Pagination .button:hover {
+  color: cornflowerblue;
+}
+
+.hidden {
+  visibility: hidden;
+}
+
+h2 {
+  color: aliceblue;
+  margin: 0px;
+  padding: 0px;
+}

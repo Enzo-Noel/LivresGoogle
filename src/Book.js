@@ -1,5 +1,6 @@
 import "./Book.css";
 import React from "react";
+import bookEmpty from "./bookEmpty.png";
 
 // composant du livre
 export default class Book extends React.Component {
@@ -23,14 +24,16 @@ export default class Book extends React.Component {
     let image = "";
     // Si il n'y a pas d'image, on affiche une image par défaut
     if (volumeInfo.imageLinks === undefined) {
-      image = "https://via.placeholder.com/150";
+      image = bookEmpty;
     } else {
       image = volumeInfo.imageLinks.thumbnail;
     }
 
     return (
       <div className="Book">
-        <img className="thumbnail" src={image} alt={alt} />
+        <a href={previewLink}>
+          <img className="thumbnail" src={image} alt={alt} />
+        </a>
         <div className="text">
           <h1 className="title">
             <a href={previewLink}>{title}</a>

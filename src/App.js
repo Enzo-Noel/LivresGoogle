@@ -1,7 +1,7 @@
 import "./App.css";
 import React from "react";
 import SearchBar from "./SearchBar";
-import Footer from "./Footer";
+import Pagination from "./Pagination";
 import BookArea from "./BookArea";
 import axios from "axios";
 
@@ -23,6 +23,7 @@ export default class App extends React.Component {
       emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
       searchPromise: undefined, // Une promesse pour la recherche
       errorCheck: false,
+      chargement: false,
     };
   }
 
@@ -53,13 +54,21 @@ export default class App extends React.Component {
           .then((response) => {
             this.setState({ errorCheck: false });
             this.setState({ data: response.data });
+            // Si le nombre total de livres est inférieur a la quantité de livres voulant etre affiché
+            // alors la quantité de livres affiché ce cale sur le nombre total de livres
+            if (
+              response.data.totalItems > 0 &&
+              response.data.totalItems < newNbBooks
+            ) {
+              this.setState({ nbBooks: response.data.totalItems });
+            }
             resolve();
           })
           .catch((error) => {
             // Si il y a une erreur, on vide les données
             // et on affiche un message d'erreur
             // (J'ai essayer de recuperer l'erreur via le .catch dans le bookArea avec le props searchPromise
-            // mais react ce reactualisait une fois de trop n'affichait pas ce que je voulais
+            // mais react ce reactualisait une fois de trop et n'affichait pas ce que je voulais
             // j'ai donc "stabilisé" le fait qu'il y ait une erreur en la mettant en state et
             // en la passant en props dans le bookArea)
             this.setState({ errorCheck: true });
@@ -86,6 +95,12 @@ export default class App extends React.Component {
     this.setState({ research: "" });
     this.setState({ data: [] });
     this.setState({ page: 0 });
+    // Si il y a une recherche alors on remet le nombre de livre a 10
+    // sinon si il n'y a pas de recherche on ne peux pas modifier le nombre de livre
+    // au préalable. le reset remetrait a chaque changement la valeur a 10
+    if (this.state.emptyString.test(this.state.research) === false) {
+      this.setState({ nbBooks: 10 });
+    }
   }
 
   // Ici j'éffectue le changement de recherche
@@ -96,11 +111,16 @@ export default class App extends React.Component {
 
   // Ici j'éffectue le changement du nombre de livres affichés
   changeNbBooks(newNbBooks) {
+    const data = this.state.data;
     this.setState({ nbBooks: newNbBooks });
     let correctPage = this.state.page; // La page correcte
     // Si le changement du nombre de livre fait que la page actuelle est supérieur au nombre de page
     // possible pour cette configuration, on change la page pour la dernière page possible
-    if (newNbBooks * this.state.page >= this.state.data.totalItems) {
+    // et si il on a des livres en données
+    if (
+      newNbBooks * this.state.page >= data.totalItems &&
+      data.totalItems > 0
+    ) {
       correctPage = this.state.data.totalItems / newNbBooks - 1;
       correctPage = Math.ceil(correctPage); // On arrondi au supérieur
       this.setState({ page: correctPage });
@@ -114,18 +134,19 @@ export default class App extends React.Component {
     this.search(this.state.research, newPage, this.state.nbBooks);
   }
 
+  // Ici j'éffectue le chargement de la page
   render() {
     const data = this.state.data;
     const research = this.state.research;
     const page = this.state.page;
     const nbBooks = this.state.nbBooks;
     const errorCheck = this.state.errorCheck;
-
     // Les composants
     // Barre de recherche
     const searchBar = (
       <SearchBar
         nbBooks={nbBooks}
+        ResetPage={this.resetState}
         SearchChange={this.changeSearch}
         NbBooksChange={this.changeNbBooks}
       />
@@ -140,34 +161,34 @@ export default class App extends React.Component {
       />
     );
     // Footer avec la pagination
-    const footer = (
-      <Footer
+    const pagination = (
+      <Pagination
         data={data}
         page={page}
         nbBooks={nbBooks}
         PageChange={this.changePage}
       />
     );
+    // Si il y a une erreur ou
+    // si il y a une recherche mais pas de données, on affiche la barre de recherche et un message
+    if (errorCheck || data.totalItems <= 0) {
+      return (
+        <div className="App">
+          {searchBar}
+          {bookArea}
+        </div>
+      );
+    }
     // Si il y a des données pour la recherche, on affiche la barre de recherche, les livres et le footer
-    if (this.state.emptyString.test(research) === false) {
-      if (data.totalItems > 0 && nbBooks > 0 && nbBooks < 41) {
-        return (
-          <div className="App">
-            {searchBar}
-            {bookArea}
-            {footer}
-          </div>
-        );
-      }
-      // Si il y a une recherche mais pas de données, on affiche la barre de recherche et un message d'erreur
-      else if (data.totalItems <= 0) {
-        return (
-          <div className="App">
-            {searchBar}
-            {bookArea}
-          </div>
-        );
-      }
+    if (data.totalItems > 0) {
+      return (
+        <div className="App">
+          {searchBar}
+          {pagination}
+          {bookArea}
+          {pagination}
+        </div>
+      );
     }
     // affichage de base
     return <div className="App">{searchBar}</div>;
