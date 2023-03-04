@@ -19,7 +19,7 @@ export default class BookArea extends React.Component {
       display = books.map((book) => {
         return <Book key={book.id} book={book} />;
       });
-    } else if (this.props.error) {
+    } else if (this.props.errorCheck) {
       display = <p>Erreur avec la requête, veuillez ressayer.</p>;
     }
 

@@ -8,8 +8,8 @@ export default class Book extends React.Component {
   // de la description et du lien vers la lecture en ligne
 
   render() {
-    const title = this.props.book.volumeInfo.title;
     const volumeInfo = this.props.book.volumeInfo;
+    const title = volumeInfo.title;
 
     let description = volumeInfo.description;
     // Si il n'y a pas de description, on affiche "pas de description"

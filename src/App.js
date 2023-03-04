@@ -11,9 +11,10 @@ export default class App extends React.Component {
   constructor(props) {
     super(props);
     this.search = this.search.bind(this);
-    this.changePage = this.changePage.bind(this);
+    this.changeSearch = this.changeSearch.bind(this);
     this.changeNbBooks = this.changeNbBooks.bind(this);
-    this.reset = this.reset.bind(this);
+    this.changePage = this.changePage.bind(this);
+    this.resetState = this.resetState.bind(this);
     this.state = {
       research: "", // La recherche
       data: [], // Les données
@@ -21,21 +22,24 @@ export default class App extends React.Component {
       nbBooks: 10, // Le nombre de livres de base
       emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
       searchPromise: undefined, // Une promesse pour la recherche
-      error: false,
+      errorCheck: false,
     };
   }
 
-  // Ici j'éffectue la recherche en fonction de la suite de caractere entrée
-  // et dependant de la page
+  // Ici j'éffectue la recherche en fonction de la suite de caractere entrée,
+  // dependant de la page et du nombre de livre a afficher
+  // J'ai du faire passer les paramètres a chaque recherche car je n'arrive pas a le faire fonctionner
+  // correctement sans ça.
   search(newSearch, newPage, newNbBooks) {
     // Si il y a une suite de caractere, on effectue la recherche
     if (this.state.emptyString.test(newSearch) === false) {
       let page = newPage;
-      // Si la recherche a changé, on revient à la page 0
+      // Si la recherche change par rapport a la recherche précedente, on revient à la page 0
       if (newSearch !== this.state.research) {
         page = 0;
         this.setState({ page: page });
       }
+      // Je crée une promesse pour la recherche
       const newSearchPromise = new Promise((resolve) => {
         let requete =
           "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
@@ -47,13 +51,19 @@ export default class App extends React.Component {
         axios
           .get(requete)
           .then((response) => {
-            resolve();
+            this.setState({ errorCheck: false });
             this.setState({ data: response.data });
-            this.setState({ research: newSearch });
+            resolve();
           })
           .catch((error) => {
-            this.setState({ error: true });
-            this.reset(newSearch);
+            // Si il y a une erreur, on vide les données
+            // et on affiche un message d'erreur
+            // (J'ai essayer de recuperer l'erreur via le .catch dans le bookArea avec le props searchPromise
+            // mais react ce reactualisait une fois de trop n'affichait pas ce que je voulais
+            // j'ai donc "stabilisé" le fait qu'il y ait une erreur en la mettant en state et
+            // en la passant en props dans le bookArea)
+            this.setState({ errorCheck: true });
+            this.resetState();
             console.log(error);
           });
       });
@@ -62,73 +72,74 @@ export default class App extends React.Component {
       // Si il y a une promesse en cours, on attend qu'elle soit terminée puis on vide les données
       if (this.state.searchPromise !== undefined) {
         this.state.searchPromise.then(() => {
-          this.reset(newSearch);
-          this.setState({ searchPromise: undefined });
+          this.resetState();
         });
       } else {
-        // Sinon on vide les données
-        this.reset(newSearch);
+        // Si il n'y a pas de promesse en cours et que la recherche est vide on vide les données
+        this.resetState();
       }
     }
   }
 
-  reset(search) {
-    this.setState({ research: search });
+  // Ici j'éffectue le reset des données
+  resetState() {
+    this.setState({ research: "" });
     this.setState({ data: [] });
+    this.setState({ page: 0 });
   }
 
+  // Ici j'éffectue le changement de recherche
+  changeSearch(newSearch) {
+    this.setState({ research: newSearch });
+    this.search(newSearch, this.state.page, this.state.nbBooks);
+  }
+
+  // Ici j'éffectue le changement du nombre de livres affichés
   changeNbBooks(newNbBooks) {
     this.setState({ nbBooks: newNbBooks });
-    let correctPage = this.state.page;
+    let correctPage = this.state.page; // La page correcte
+    // Si le changement du nombre de livre fait que la page actuelle est supérieur au nombre de page
+    // possible pour cette configuration, on change la page pour la dernière page possible
     if (newNbBooks * this.state.page >= this.state.data.totalItems) {
       correctPage = this.state.data.totalItems / newNbBooks - 1;
-      correctPage = Math.ceil(correctPage);
+      correctPage = Math.ceil(correctPage); // On arrondi au supérieur
       this.setState({ page: correctPage });
     }
     this.search(this.state.research, correctPage, newNbBooks);
   }
 
   // Ici j'éffectue le changement de page
-  // normalement je l'aurais fait assez simplement en reasignant la valeur de la page via sont setter
-  // mais je ne comprend pas le setter n'est pris en compte qu'apres toute la fonction, donc j'ai
-  // contourner en passant la page d'une autre façon.
   changePage(newPage) {
     this.setState({ page: newPage });
     this.search(this.state.research, newPage, this.state.nbBooks);
   }
 
   render() {
-    const research = this.state.research;
     const data = this.state.data;
+    const research = this.state.research;
     const page = this.state.page;
     const nbBooks = this.state.nbBooks;
-    const searchPromise = this.state.searchPromise;
-    const error = this.state.error;
+    const errorCheck = this.state.errorCheck;
 
-    let hadData = false;
-    // Si il y a des données, on le signale
-    if (data.totalItems > 0) {
-      hadData = true;
-    }
-
+    // Les composants
+    // Barre de recherche
     const searchBar = (
       <SearchBar
-        data={data}
-        page={page}
         nbBooks={nbBooks}
-        SearchChange={this.search}
+        SearchChange={this.changeSearch}
         NbBooksChange={this.changeNbBooks}
       />
     );
+    // Les livres ou les messages d'erreur
     const bookArea = (
       <BookArea
         data={data}
         research={research}
-        searchPromise={searchPromise}
-        error={error}
+        errorCheck={errorCheck}
         nbBooks={nbBooks}
       />
     );
+    // Footer avec la pagination
     const footer = (
       <Footer
         data={data}
@@ -139,7 +150,7 @@ export default class App extends React.Component {
     );
     // Si il y a des données pour la recherche, on affiche la barre de recherche, les livres et le footer
     if (this.state.emptyString.test(research) === false) {
-      if (hadData && nbBooks > 0 && nbBooks < 41) {
+      if (data.totalItems > 0 && nbBooks > 0 && nbBooks < 41) {
         return (
           <div className="App">
             {searchBar}
@@ -149,7 +160,7 @@ export default class App extends React.Component {
         );
       }
       // Si il y a une recherche mais pas de données, on affiche la barre de recherche et un message d'erreur
-      else if (!hadData) {
+      else if (data.totalItems <= 0) {
         return (
           <div className="App">
             {searchBar}
@@ -158,6 +169,7 @@ export default class App extends React.Component {
         );
       }
     }
+    // affichage de base
     return <div className="App">{searchBar}</div>;
   }
 }

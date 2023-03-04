@@ -12,13 +12,8 @@ export default class SearchBar extends React.Component {
 
   // Permet la récupération de ce qui est entré et le remonte au parent a chaque fois que celui-ci change
   handleSearch(e) {
-    this.props.SearchChange(
-      e.target.value,
-      this.props.page,
-      this.props.nbBooks
-    );
+    this.props.SearchChange(e.target.value);
   }
-
   handleNbBooks(e) {
     this.props.NbBooksChange(e.target.value);
   }
