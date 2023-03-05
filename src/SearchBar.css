@@ -16,7 +16,7 @@
 
 .parameters {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
   width: 100%;
@@ -32,12 +32,17 @@
   color: black;
 }
 
+.search,
+.nbBooks {
+  padding: 5px 0 5px 0;
+}
+
 .nbBooks {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
-  width: 16%;
+  width: 225px;
 }
 
 .nbBooksLabel {
