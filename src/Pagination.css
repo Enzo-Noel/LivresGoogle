@@ -19,3 +19,49 @@ h5 {
   margin: 0px;
   padding: 0px;
 }
+
+.prev::after,
+.next::after {
+  display: none;
+}
+
+.prev::after {
+  content: "<<";
+}
+
+.next::after {
+  content: ">>";
+}
+
+@media screen and (max-width: 1200px) {
+  .Pagination .button::after {
+    display: block;
+    text-indent: 0;
+    line-height: initial;
+  }
+  .Pagination .button {
+    text-indent: -9999px;
+    line-height: 0;
+  }
+  .Pagination {
+    padding: 1rem 0rem 1rem 0;
+  }
+
+  .Pagination * {
+    font-size: 1.3rem;
+  }
+
+  .Livres {
+    font-size: 0.8rem;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .Pagination * {
+    font-size: 1rem;
+  }
+
+  .Livres {
+    font-size: 0.8rem;
+  }
+}

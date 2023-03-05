@@ -28,12 +28,12 @@ export default class Pagination extends React.Component {
 
   render() {
     let prevBtn = (
-      <h2 className="button" onClick={this.handleMinus}>
+      <h2 className="button prev" onClick={this.handleMinus}>
         Précedent
       </h2>
     );
     let nextBtn = (
-      <h2 className="button" onClick={this.handlePlus}>
+      <h2 className="button next" onClick={this.handlePlus}>
         Suivant
       </h2>
     );
@@ -48,7 +48,7 @@ export default class Pagination extends React.Component {
     if (page === 0) {
       leftBorder = page + 1;
       prevBtn = (
-        <h2 className="button hidden" onClick={this.handleMinus}>
+        <h2 className="button prev hidden" onClick={this.handleMinus}>
           Précedent
         </h2>
       );
@@ -60,7 +60,7 @@ export default class Pagination extends React.Component {
     ) {
       rightBorder = data.totalItems;
       nextBtn = (
-        <h2 className="button hidden" onClick={this.handlePlus}>
+        <h2 className="button next hidden" onClick={this.handlePlus}>
           Suivant
         </h2>
       );
@@ -69,10 +69,10 @@ export default class Pagination extends React.Component {
     // On crée la pagination correctement en fonction des deux conditions précédentes
     let whereWeAre = (
       <div>
-        <h2>
+        <h2 className="Pages">
           {page + 1} / {Math.ceil(data.totalItems / nbBooks)} Pages
         </h2>
-        <h5>
+        <h5 className="Livres">
           {leftBorder} ... {rightBorder} / {data.totalItems} Livres
         </h5>
       </div>

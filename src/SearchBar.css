@@ -60,3 +60,24 @@ h1,
 label {
   color: aliceblue;
 }
+
+@media screen and (max-width: 1200px) {
+  .appName {
+    font-size: 2rem;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .appName {
+    font-size: 1rem;
+    margin: 1rem 0 1rem 0;
+  }
+
+  .nbBooksLabel {
+    font-size: 0.8rem;
+  }
+  .nbBooksInput {
+    width: 80%;
+    margin-top: 5px;
+  }
+}

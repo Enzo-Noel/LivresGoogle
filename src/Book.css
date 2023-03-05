@@ -1,6 +1,7 @@
 .Book {
   display: flex;
   justify-content: space-evenly;
+  align-items: center;
   height: 200px;
   width: 33%;
   padding: 10px 0 10px 0;
@@ -8,7 +9,7 @@
 
 .thumbnail {
   width: 140px;
-  height: 100%;
+  height: 200px;
   border-radius: 15px;
 }
 
@@ -23,6 +24,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  box-sizing: border-box;
   width: 100%;
   padding: 5px 0 5px 0;
   margin: 0;
@@ -48,3 +50,49 @@
   -webkit-line-clamp: 7;
   -webkit-box-orient: vertical;
 }
+
+@media screen and (max-width: 1200px) {
+  .Book {
+    width: 90%;
+  }
+  .thumbnail {
+    width: 120px;
+    height: 180px;
+  }
+  .description,
+  .title {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .thumbnail {
+    width: 100px;
+    height: 160px;
+  }
+  .description,
+  .title {
+    font-size: smaller;
+  }
+  .text {
+    margin-top: 10px;
+  }
+  .Book {
+    padding: 0;
+    height: 180px;
+  }
+}
+
+/* @media screen and (max-width: 1000px) {
+  .thumbnail {
+    width: 110px;
+    height: 170px;
+    margin-left: 10px;
+  }
+  .description,
+  .title {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+} */

@@ -41,7 +41,7 @@ export default class App extends React.Component {
         this.setState({ page: page });
       }
       // Je crée une promesse pour la recherche
-      const newSearchPromise = new Promise((resolve, reject) => {
+      const newSearchPromise = new Promise((resolve) => {
         let requete =
           "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
           newSearch +
