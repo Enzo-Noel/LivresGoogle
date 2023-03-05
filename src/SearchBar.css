@@ -19,10 +19,6 @@
   flex-direction: row;
   justify-content: space-evenly;
   align-items: center;
-  width: 60%;
-}
-
-.search {
   width: 100%;
 }
 
@@ -38,17 +34,21 @@
 
 .nbBooks {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: space-evenly;
   align-items: center;
-  width: 100%;
+  width: 16%;
 }
 
-.nbBooksLabel,
+.nbBooksLabel {
+  margin: 0;
+  padding: 0;
+}
+
 .nbBooksInput {
-  margin: 0px;
-  padding: 0px;
   width: 100%;
+  padding: 0;
+  margin: 0;
 }
 
 h1,

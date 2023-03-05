@@ -23,7 +23,6 @@ export default class App extends React.Component {
       emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
       searchPromise: undefined, // Une promesse pour la recherche
       errorCheck: false,
-      chargement: false,
     };
   }
 
@@ -35,6 +34,7 @@ export default class App extends React.Component {
     // Si il y a une suite de caractere, on effectue la recherche
     if (this.state.emptyString.test(newSearch) === false) {
       let page = newPage;
+      let index = page * newNbBooks;
       // Si la recherche change par rapport a la recherche précedente, on revient à la page 0
       if (newSearch !== this.state.research) {
         page = 0;
@@ -46,7 +46,7 @@ export default class App extends React.Component {
           "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
           newSearch +
           "&startIndex=" +
-          page * newNbBooks +
+          index +
           "&maxResults=" +
           newNbBooks;
         axios
@@ -54,6 +54,7 @@ export default class App extends React.Component {
           .then((response) => {
             this.setState({ errorCheck: false });
             this.setState({ data: response.data });
+            this.setState({ nbBooks: newNbBooks });
             // Si le nombre total de livres est inférieur a la quantité de livres voulant etre affiché
             // alors la quantité de livres affiché ce cale sur le nombre total de livres
             if (
@@ -72,7 +73,6 @@ export default class App extends React.Component {
             // j'ai donc "stabilisé" le fait qu'il y ait une erreur en la mettant en state et
             // en la passant en props dans le bookArea)
             this.setState({ errorCheck: true });
-            this.resetState();
             console.log(error);
           });
       });
@@ -180,7 +180,7 @@ export default class App extends React.Component {
       );
     }
     // Si il y a des données pour la recherche, on affiche la barre de recherche, les livres et le footer
-    if (data.totalItems > 0) {
+    else if (data.totalItems > 0) {
       return (
         <div className="App">
           {searchBar}

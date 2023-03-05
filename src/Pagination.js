@@ -70,9 +70,11 @@ export default class Pagination extends React.Component {
     let whereWeAre = (
       <div>
         <h2>
-          {leftBorder} ... {rightBorder} / {data.totalItems} Livres - {page + 1}{" "}
-          / {Math.ceil(data.totalItems / nbBooks)} Pages
+          {page + 1} / {Math.ceil(data.totalItems / nbBooks)} Pages
         </h2>
+        <h5>
+          {leftBorder} ... {rightBorder} / {data.totalItems} Livres
+        </h5>
       </div>
     );
     return (

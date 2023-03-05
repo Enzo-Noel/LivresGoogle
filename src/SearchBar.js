@@ -41,6 +41,9 @@ export default class SearchBar extends React.Component {
             />
           </div>
           <div className="nbBooks">
+            <label className="nbBooksLabel" htmlFor="nbBooks">
+              Livres par pages : {this.props.nbBooks}
+            </label>
             <input
               name="nbBooks"
               className="nbBooksInput"
@@ -51,9 +54,6 @@ export default class SearchBar extends React.Component {
               min="1"
               max="40"
             />
-            <label className="nbBooksLabel" htmlFor="nbBooks">
-              Livres : {this.props.nbBooks}
-            </label>
           </div>
         </div>
       </div>

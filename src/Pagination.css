@@ -1,6 +1,7 @@
 .Pagination {
   display: flex;
   justify-content: space-evenly;
+  align-items: center;
   padding: 2rem 0 2rem 0;
 }
 
@@ -12,7 +13,8 @@
   visibility: hidden;
 }
 
-h2 {
+h2,
+h5 {
   color: aliceblue;
   margin: 0px;
   padding: 0px;
