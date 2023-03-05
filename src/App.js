@@ -19,7 +19,6 @@ export default class App extends React.Component {
       research: "", // La recherche
       data: [], // Les données
       page: 0, // La page
-      pageBefore: 0, // La nouvelle page
       nbBooks: 10, // Le nombre de livres de base
       emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
       searchPromise: undefined, // Une promesse pour la recherche
@@ -131,7 +130,6 @@ export default class App extends React.Component {
 
   // Ici j'éffectue le changement de page
   changePage(newPage) {
-    this.setState({ pageBefore: this.state.page });
     this.setState({ page: newPage });
     this.search(this.state.research, newPage, this.state.nbBooks);
   }
