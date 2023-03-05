@@ -43,7 +43,7 @@
   display: -webkit-box;
   white-space: break-spaces;
   color: aliceblue;
-  padding: 4px 5px 4px 5px;
+  padding: 0;
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -54,6 +54,7 @@
 @media screen and (max-width: 1200px) {
   .Book {
     width: 90%;
+    margin-left: 10px;
   }
   .thumbnail {
     width: 120px;
@@ -83,16 +84,3 @@
     height: 180px;
   }
 }
-
-/* @media screen and (max-width: 1000px) {
-  .thumbnail {
-    width: 110px;
-    height: 170px;
-    margin-left: 10px;
-  }
-  .description,
-  .title {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-} */
