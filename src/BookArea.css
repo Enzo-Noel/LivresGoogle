@@ -11,3 +11,7 @@
   color: aliceblue;
   padding-top: 10%;
 }
+
+.Pagination + .BookArea h3 {
+  padding-top: 5%;
+}

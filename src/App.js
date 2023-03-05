@@ -22,7 +22,7 @@ export default class App extends React.Component {
       nbBooks: 10, // Le nombre de livres de base
       emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
       searchPromise: undefined, // Une promesse pour la recherche
-      errorCheck: false,
+      errorCheck: false, // Un booléen pour vérifier si il y a une erreur
     };
   }
 
@@ -31,7 +31,7 @@ export default class App extends React.Component {
   // J'ai du faire passer les paramètres a chaque recherche car je n'arrive pas a le faire fonctionner
   // correctement sans ça.
   search(newSearch, newPage, newNbBooks) {
-    // Si il y a une suite de caractere, on effectue la recherche
+    // Si il y a une suite de caractere non vide, on effectue la recherche
     if (this.state.emptyString.test(newSearch) === false) {
       let page = newPage;
       let index = page * newNbBooks;
@@ -41,12 +41,12 @@ export default class App extends React.Component {
         this.setState({ page: page });
       }
       // Je crée une promesse pour la recherche
-      const newSearchPromise = new Promise((resolve) => {
+      const newSearchPromise = new Promise((resolve, reject) => {
         let requete =
           "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
           newSearch +
-          "&startIndex=" +
-          index +
+          "&startIndex=" + // rajouté un - apres le = pour provoquer une erreur et la tester
+          index + // index negatif provoque une erreur
           "&maxResults=" +
           newNbBooks;
         axios
@@ -72,7 +72,15 @@ export default class App extends React.Component {
             // mais react ce reactualisait une fois de trop et n'affichait pas ce que je voulais
             // j'ai donc "stabilisé" le fait qu'il y ait une erreur en la mettant en state et
             // en la passant en props dans le bookArea)
+            // (Je pense qu'il y'a un moyen forcement plus propre et plus simple, mais malheuresement
+            // apres différent essais je ne trouve pas comment y arriver)
             this.setState({ errorCheck: true });
+            this.setState({ searchPromise: undefined });
+            // Si il y a une promesse en cours, mais que la recherche deviens vide entre temps
+            // on annule le message d'erreur
+            if (this.state.emptyString.test(this.state.research) === true) {
+              this.setState({ errorCheck: false });
+            }
             console.log(error);
           });
       });
@@ -95,6 +103,7 @@ export default class App extends React.Component {
     this.setState({ research: "" });
     this.setState({ data: [] });
     this.setState({ page: 0 });
+    this.setState({ errorCheck: false });
     // Si il y a une recherche alors on remet le nombre de livre a 10
     // sinon si il n'y a pas de recherche on ne peux pas modifier le nombre de livre
     // au préalable. le reset remetrait a chaque changement la valeur a 10
