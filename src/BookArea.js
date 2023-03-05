@@ -13,6 +13,7 @@ export default class BookArea extends React.Component {
     };
   }
 
+  // Fonction qui change la page
   changePage(newPage) {
     this.props.PageChange(newPage);
   }
@@ -35,6 +36,7 @@ export default class BookArea extends React.Component {
     );
 
     // message de base, qui dans le cas ou les données reçu ne sont pas correctes, sera affiché
+    // Pour certains cas l'api renvoie des données avec un "totalItems" supérieur a 0, mais sans "items"
     let display = <h3>Données reçu incorrect</h3>;
 
     if (requeteApi !== undefined) {
@@ -51,12 +53,12 @@ export default class BookArea extends React.Component {
       // Si il y a une erreur avec la requete, on affiche un message
       display = <h3>Une erreur est survenu, veuillez réessayer.</h3>;
     } else if (books !== undefined) {
-      // Si il y a des livres, on les affiche
+      // Si il y a des livres, on les affiches
       display = books.map((book) => {
         return <Book key={book.id} book={book} />;
       });
     } else if (data.totalItems <= 0) {
-      // Si il n'y a pas de livres a la recherche correspondante, on affiche un message
+      // Si il n'y a pas de livres a la recherche voulu, on affiche un message le spécifiant
       display = (
         <h3>
           Aucun ouvrage correspondant à votre recherche : {this.props.research}
@@ -66,10 +68,10 @@ export default class BookArea extends React.Component {
 
     const Books = <div className="Books">{display}</div>;
 
-    // Si il n'y a pas d'erreur et qu'il y a des données corectes
+    // Si il n'y a pas d'erreur et qu'il y a des données correctes
     if (!error && data.totalItems > 0 && data.items !== undefined) {
       if (requeteApi !== undefined) {
-        // Si il y a des données et une promesse en cours,
+        // Si il y a des données précédemment reçu et une requete a l'api en cours,
         // on affiche le message de chargement et la pagination du haut
         return (
           <div className="BookArea">
@@ -78,7 +80,7 @@ export default class BookArea extends React.Component {
           </div>
         );
       } else {
-        // Si il y a des données et pas de promesse en cours on affiche le tout correctement
+        // Si il y a des données et pas de requete a l'api en cours on affiche le tout correctement
         return (
           <div className="BookArea">
             {pagination}

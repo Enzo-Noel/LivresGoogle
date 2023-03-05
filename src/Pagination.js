@@ -5,38 +5,30 @@ import React from "react";
 export default class Pagination extends React.Component {
   constructor(props) {
     super(props);
-    this.handleMinus = this.handleMinus.bind(this);
-    this.handlePlus = this.handlePlus.bind(this);
+    this.handlePrev = this.handlePrev.bind(this);
+    this.handleNext = this.handleNext.bind(this);
   }
 
-  // Si on est sur la première page, on ne peut pas aller en arrière
-  handleMinus() {
+  handlePrev() {
     const page = this.props.page;
+    // Si on est sur la première page, on ne peut pas aller en arrière
     if (page > 0) {
       this.props.PageChange(page - 1);
     }
   }
 
-  // Si on est sur la dernière page, on ne peut pas aller plus loin
-  handlePlus() {
+  handleNext() {
     const page = this.props.page;
     const data = this.props.data;
+    // Si on est sur la dernière page, on ne peut pas aller plus loin
     if (data.totalItems > (page + 1) * this.props.nbBooks) {
       this.props.PageChange(page + 1);
     }
   }
 
   render() {
-    let prevBtn = (
-      <h2 className="button prev" onClick={this.handleMinus}>
-        Précedent
-      </h2>
-    );
-    let nextBtn = (
-      <h2 className="button next" onClick={this.handlePlus}>
-        Suivant
-      </h2>
-    );
+    const btnPrev = document.querySelector(".prev");
+    const btnNext = document.querySelector(".next");
     const page = this.props.page;
     const data = this.props.data;
     const nbBooks = this.props.nbBooks;
@@ -44,14 +36,29 @@ export default class Pagination extends React.Component {
     let leftBorder = nbBooksDisplay - nbBooks;
     let rightBorder = nbBooksDisplay;
 
+    // On crée les boutons de pagination
+    // On cache le bouton précédent par défaut car on commence a chaque fois sur la première page
+    let prevBtn = (
+      <h2 className="button prev hidden" onClick={this.handlePrev}>
+        Précedent
+      </h2>
+    );
+    let nextBtn = (
+      <h2 className="button next" onClick={this.handleNext}>
+        Suivant
+      </h2>
+    );
+
     // Si on est sur la première page, on affiche les 10 premiers résultats
     if (page === 0) {
       leftBorder = page + 1;
-      prevBtn = (
-        <h2 className="button prev hidden" onClick={this.handleMinus}>
-          Précedent
-        </h2>
-      );
+      if (btnPrev !== null) {
+        btnPrev.classList.add("hidden");
+      }
+    } else {
+      if (btnPrev !== null) {
+        btnPrev.classList.remove("hidden");
+      }
     }
     // Si on est sur la dernière page, on affiche le nombre de résultats restants
     if (
@@ -59,11 +66,13 @@ export default class Pagination extends React.Component {
       nbBooksDisplay === data.totalItems
     ) {
       rightBorder = data.totalItems;
-      nextBtn = (
-        <h2 className="button next hidden" onClick={this.handlePlus}>
-          Suivant
-        </h2>
-      );
+      if (btnNext !== null) {
+        btnNext.classList.add("hidden");
+      }
+    } else {
+      if (btnNext !== null) {
+        btnNext.classList.remove("hidden");
+      }
     }
 
     // On crée la pagination correctement en fonction des deux conditions précédentes

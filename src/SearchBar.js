@@ -11,7 +11,7 @@ export default class SearchBar extends React.Component {
     this.handleReset = this.handleReset.bind(this);
   }
 
-  // Permet la récupération de ce qui est entré et le remonte au parent a chaque fois que celui-ci change
+  // Permet la récupération des paramètres de recherche et les envoie au composant parent (App.js)
   handleSearch(e) {
     this.props.SearchChange(e.target.value);
   }

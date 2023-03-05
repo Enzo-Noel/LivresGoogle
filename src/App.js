@@ -24,20 +24,18 @@ export default class App extends React.Component {
     };
   }
 
-  // Ici j'éffectue la recherche en fonction de la suite de caractere entrée,
-  // dependant de la page et du nombre de livre a afficher
-  // J'ai du faire passer les paramètres a chaque recherche car je n'arrive pas a le faire fonctionner
-  // correctement sans ça.
+  // Ici j'éffectue la requete en fonction de la suite de la recherche entrée,
+  // de la page et du nombre de livre a afficher.
   search(newSearch, newPage, newNbBooks) {
     // Si il y a une suite de caractere non vide, on effectue la recherche
     if (this.state.emptyString.test(newSearch) === false) {
       let page = newPage;
-      let index = page * newNbBooks;
       // Si la recherche change par rapport a la recherche précedente, on revient à la page 0
       if (newSearch !== this.state.research) {
         page = 0;
         this.setState({ page: page });
       }
+      let index = page * newNbBooks;
       // Je crée une promesse pour la recherche
       const newRequeteApi = new Promise((resolve, reject) => {
         let requete =
@@ -50,17 +48,18 @@ export default class App extends React.Component {
         axios
           .get(requete)
           .then((r) => {
-            this.setState({ requeteApi: undefined });
             this.setState({ data: r.data });
             resolve();
           })
           .catch((error) => {
-            this.setState({ requeteApi: undefined });
             console.log(error);
             reject();
           });
       });
       this.setState({ requeteApi: newRequeteApi });
+      newRequeteApi.finally(() => {
+        this.setState({ requeteApi: undefined });
+      });
     } else {
       this.resetState();
     }
