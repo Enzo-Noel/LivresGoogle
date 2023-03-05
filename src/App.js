@@ -1,7 +1,6 @@
 import "./App.css";
 import React from "react";
 import SearchBar from "./SearchBar";
-import Pagination from "./Pagination";
 import BookArea from "./BookArea";
 import axios from "axios";
 
@@ -16,13 +15,12 @@ export default class App extends React.Component {
     this.changePage = this.changePage.bind(this);
     this.resetState = this.resetState.bind(this);
     this.state = {
+      emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
       research: "", // La recherche
       data: [], // Les données
       page: 0, // La page
       nbBooks: 10, // Le nombre de livres de base
-      emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
-      searchPromise: undefined, // Une promesse pour la recherche
-      errorCheck: false, // Un booléen pour vérifier si il y a une erreur
+      requeteApi: undefined, // Une promesse pour la requete a l'api
     };
   }
 
@@ -41,7 +39,7 @@ export default class App extends React.Component {
         this.setState({ page: page });
       }
       // Je crée une promesse pour la recherche
-      const newSearchPromise = new Promise((resolve) => {
+      const newRequeteApi = new Promise((resolve, reject) => {
         let requete =
           "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
           newSearch +
@@ -51,65 +49,29 @@ export default class App extends React.Component {
           newNbBooks;
         axios
           .get(requete)
-          .then((response) => {
-            this.setState({ errorCheck: false });
-            this.setState({ data: response.data });
-            // Si le nombre total de livres est inférieur a la quantité de livres voulant etre affiché
-            // alors la quantité de livres affiché ce cale sur le nombre total de livres
-            if (
-              response.data.totalItems > 0 &&
-              response.data.totalItems < newNbBooks
-            ) {
-              this.setState({ nbBooks: response.data.totalItems });
-            }
-            this.setState({ searchPromise: undefined });
+          .then((r) => {
+            this.setState({ requeteApi: undefined });
+            this.setState({ data: r.data });
             resolve();
           })
           .catch((error) => {
-            // Si il y a une erreur, on vide les données
-            // et on affiche un message d'erreur
-            // (J'ai essayer de recuperer l'erreur via le .catch dans le bookArea avec le props searchPromise
-            // mais react ce reactualisait une fois de trop et n'affichait pas ce que je voulais
-            // j'ai donc "stabilisé" le fait qu'il y ait une erreur en la mettant en state et
-            // en la passant en props dans le bookArea)
-            // (Je pense qu'il y'a un moyen forcement plus propre et plus simple, mais malheuresement
-            // apres différent essais je ne trouve pas comment y arriver)
-            this.setState({ errorCheck: true });
-            this.setState({ searchPromise: undefined });
-            // Si il y a une promesse en cours, mais que la recherche deviens vide entre temps
-            // on annule le message d'erreur
-            if (this.state.emptyString.test(this.state.research) === true) {
-              this.setState({ errorCheck: false });
-            }
+            this.setState({ requeteApi: undefined });
             console.log(error);
+            reject();
           });
       });
-      this.setState({ searchPromise: newSearchPromise });
+      this.setState({ requeteApi: newRequeteApi });
     } else {
-      // Si il y a une promesse en cours, on attend qu'elle soit terminée puis on vide les données
-      if (this.state.searchPromise !== undefined) {
-        this.state.searchPromise.then(() => {
-          this.resetState();
-        });
-      } else {
-        // Si il n'y a pas de promesse en cours et que la recherche est vide on vide les données
-        this.resetState();
-      }
+      this.resetState();
     }
   }
 
-  // Ici j'éffectue le reset des données
+  // Remise a zero des informations
   resetState() {
     this.setState({ research: "" });
     this.setState({ data: [] });
     this.setState({ page: 0 });
-    this.setState({ errorCheck: false });
-    // Si il y a une recherche alors on remet le nombre de livre a 10
-    // sinon si il n'y a pas de recherche on ne peux pas modifier le nombre de livre
-    // au préalable. le reset remetrait a chaque changement la valeur a 10
-    if (this.state.emptyString.test(this.state.research) === false) {
-      this.setState({ nbBooks: 10 });
-    }
+    this.setState({ requeteApi: undefined });
   }
 
   // Ici j'éffectue le changement de recherche
@@ -120,17 +82,15 @@ export default class App extends React.Component {
 
   // Ici j'éffectue le changement du nombre de livres affichés
   changeNbBooks(newNbBooks) {
-    const data = this.state.data;
+    const totalItems = this.state.data.totalItems;
+    const page = this.state.page;
     this.setState({ nbBooks: newNbBooks });
-    let correctPage = this.state.page; // La page correcte
+    let correctPage = page; // La page correcte
     // Si le changement du nombre de livre fait que la page actuelle est supérieur au nombre de page
     // possible pour cette configuration, on change la page pour la dernière page possible
     // et si il on a des livres en données
-    if (
-      newNbBooks * this.state.page >= data.totalItems &&
-      data.totalItems > 0
-    ) {
-      correctPage = this.state.data.totalItems / newNbBooks - 1;
+    if (newNbBooks * page >= totalItems && totalItems > 0) {
+      correctPage = totalItems / newNbBooks - 1;
       correctPage = Math.ceil(correctPage); // On arrondi au supérieur
       this.setState({ page: correctPage });
     }
@@ -145,12 +105,11 @@ export default class App extends React.Component {
 
   // Ici j'éffectue le chargement de la page
   render() {
-    const data = this.state.data;
-    const research = this.state.research;
-    const page = this.state.page;
-    const nbBooks = this.state.nbBooks;
-    const errorCheck = this.state.errorCheck;
-    const searchPromise = this.state.searchPromise;
+    const info = this.state;
+    const data = info.data;
+    const nbBooks = info.nbBooks;
+    const research = info.research;
+    const requeteApi = info.requeteApi;
 
     // Les composants
     // Barre de recherche
@@ -162,74 +121,20 @@ export default class App extends React.Component {
         NbBooksChange={this.changeNbBooks}
       />
     );
-    // Les livres ou les messages d'erreur
+    // La zone des livres
     const bookArea = (
       <BookArea
+        info={info}
         data={data}
+        nbBooks={nbBooks}
         research={research}
-        errorCheck={errorCheck}
-        nbBooks={nbBooks}
-        searchPromise={searchPromise}
-      />
-    );
-    // La pagination
-    const pagination = (
-      <Pagination
-        data={data}
-        page={page}
-        nbBooks={nbBooks}
+        requeteApi={requeteApi}
         PageChange={this.changePage}
       />
     );
 
-    // Si il y a une erreur avec la requete on affiche un message d'erreur
-    // ou
-    // si il y a une recherche mais pas de données
-    // on affiche un message disant qu'on ne trouve rien pour cette recherche
-    if (errorCheck || data.totalItems <= 0) {
-      return (
-        <div className="App">
-          {searchBar}
-          {bookArea}
-        </div>
-      );
-    }
-    // Si il y a des données pour la recherche, on affiche la barre de recherche, les livres et le footer
-    else if (data.totalItems > 0) {
-      if (data.items !== undefined && searchPromise !== undefined) {
-        // Si il y a des données et une promesse en cours,
-        // on affiche le message de chargement et la pagination du haut
-        return (
-          <div className="App">
-            {searchBar}
-            {pagination}
-            {bookArea}
-          </div>
-        );
-      } else if (data.items === undefined || searchPromise !== undefined) {
-        // Si il y a des données incorrect ou une promesse en cours,
-        // on affiche respectivement un message d'erreur ou le message de chargement
-        return (
-          <div className="App">
-            {searchBar}
-            {bookArea}
-          </div>
-        );
-      } else {
-        // Si il y a des données et pas de promesse en cours on affiche le tout correctement
-        return (
-          <div className="App">
-            {searchBar}
-            {pagination}
-            {bookArea}
-            {pagination}
-          </div>
-        );
-      }
-    }
-    // Si il y a une promesse en cours, mais pas de données aupaaravant
-    // cas echeant de quand on fait une recherche a partir de la barre de recherche vide
-    if (searchPromise !== undefined) {
+    // Si il y a une recherche
+    if (this.state.emptyString.test(research) === false) {
       return (
         <div className="App">
           {searchBar}

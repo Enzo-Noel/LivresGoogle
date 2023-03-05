@@ -1,4 +1,4 @@
-.BookArea {
+.Books {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -7,7 +7,7 @@
   width: 100%;
 }
 
-.BookArea h3 {
+.Books h3 {
   color: aliceblue;
   padding-top: 10%;
 }
@@ -17,7 +17,7 @@
 }
 
 @media screen and (max-width: 1200px) {
-  .BookArea {
+  .Books {
     flex-direction: column;
   }
 }
