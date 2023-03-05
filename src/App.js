@@ -19,6 +19,7 @@ export default class App extends React.Component {
       research: "", // La recherche
       data: [], // Les données
       page: 0, // La page
+      pageBefore: 0, // La nouvelle page
       nbBooks: 10, // Le nombre de livres de base
       emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
       searchPromise: undefined, // Une promesse pour la recherche
@@ -54,7 +55,6 @@ export default class App extends React.Component {
           .then((response) => {
             this.setState({ errorCheck: false });
             this.setState({ data: response.data });
-            this.setState({ nbBooks: newNbBooks });
             // Si le nombre total de livres est inférieur a la quantité de livres voulant etre affiché
             // alors la quantité de livres affiché ce cale sur le nombre total de livres
             if (
@@ -63,6 +63,7 @@ export default class App extends React.Component {
             ) {
               this.setState({ nbBooks: response.data.totalItems });
             }
+            this.setState({ searchPromise: undefined });
             resolve();
           })
           .catch((error) => {
@@ -130,6 +131,7 @@ export default class App extends React.Component {
 
   // Ici j'éffectue le changement de page
   changePage(newPage) {
+    this.setState({ pageBefore: this.state.page });
     this.setState({ page: newPage });
     this.search(this.state.research, newPage, this.state.nbBooks);
   }
@@ -141,6 +143,8 @@ export default class App extends React.Component {
     const page = this.state.page;
     const nbBooks = this.state.nbBooks;
     const errorCheck = this.state.errorCheck;
+    const searchPromise = this.state.searchPromise;
+
     // Les composants
     // Barre de recherche
     const searchBar = (
@@ -158,9 +162,10 @@ export default class App extends React.Component {
         research={research}
         errorCheck={errorCheck}
         nbBooks={nbBooks}
+        searchPromise={searchPromise}
       />
     );
-    // Footer avec la pagination
+    // La pagination
     const pagination = (
       <Pagination
         data={data}
@@ -169,8 +174,11 @@ export default class App extends React.Component {
         PageChange={this.changePage}
       />
     );
-    // Si il y a une erreur ou
-    // si il y a une recherche mais pas de données, on affiche la barre de recherche et un message
+
+    // Si il y a une erreur avec la requete on affiche un message d'erreur
+    // ou
+    // si il y a une recherche mais pas de données
+    // on affiche un message disant qu'on ne trouve rien pour cette recherche
     if (errorCheck || data.totalItems <= 0) {
       return (
         <div className="App">
@@ -181,12 +189,44 @@ export default class App extends React.Component {
     }
     // Si il y a des données pour la recherche, on affiche la barre de recherche, les livres et le footer
     else if (data.totalItems > 0) {
+      if (data.items !== undefined && searchPromise !== undefined) {
+        // Si il y a des données et une promesse en cours,
+        // on affiche le message de chargement et la pagination du haut
+        return (
+          <div className="App">
+            {searchBar}
+            {pagination}
+            {bookArea}
+          </div>
+        );
+      } else if (data.items === undefined || searchPromise !== undefined) {
+        // Si il y a des données incorrect ou une promesse en cours,
+        // on affiche respectivement un message d'erreur ou le message de chargement
+        return (
+          <div className="App">
+            {searchBar}
+            {bookArea}
+          </div>
+        );
+      } else {
+        // Si il y a des données et pas de promesse en cours on affiche le tout correctement
+        return (
+          <div className="App">
+            {searchBar}
+            {pagination}
+            {bookArea}
+            {pagination}
+          </div>
+        );
+      }
+    }
+    // Si il y a une promesse en cours, mais pas de données aupaaravant
+    // cas echeant de quand on fait une recherche a partir de la barre de recherche vide
+    if (searchPromise !== undefined) {
       return (
         <div className="App">
           {searchBar}
-          {pagination}
           {bookArea}
-          {pagination}
         </div>
       );
     }
