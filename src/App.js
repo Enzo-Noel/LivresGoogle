@@ -150,15 +150,14 @@ export default class App extends React.Component {
     const bookArea = <BookArea info={info} PageChange={this.changePage} />;
 
     // Si il y a une recherche
-    if (info.emptyString.test(info.research) === false) {
-      return (
-        <div className="App">
-          {searchBar}
-          {bookArea}
-        </div>
-      );
-    }
-    // affichage de base
-    return <div className="App">{searchBar}</div>;
+    return info.emptyString.test(info.research) === false ? (
+      <div className="App">
+        {searchBar}
+        {bookArea}
+      </div>
+    ) : (
+      // affichage de base
+      <div className="App">{searchBar}</div>
+    );
   }
 }

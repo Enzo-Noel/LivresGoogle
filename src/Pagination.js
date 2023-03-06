@@ -86,6 +86,7 @@ export default class Pagination extends React.Component {
         </h5>
       </div>
     );
+    // affichage du composant
     return (
       <div className="Pagination">
         {prevBtn}

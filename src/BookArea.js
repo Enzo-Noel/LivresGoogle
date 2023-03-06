@@ -57,28 +57,24 @@ export default class BookArea extends React.Component {
     const Books = <div className="Books">{display}</div>;
 
     // Si il n'y a pas d'erreur et qu'il y a des données correctes
-    if (!errorRequete && data.totalItems > 0 && data.items !== undefined) {
-      if (requeteApi !== undefined) {
+    return !errorRequete && data.totalItems > 0 && data.items !== undefined ? (
+      requeteApi !== undefined ? (
         // Si il y a des données précédemment reçu et une requete a l'api en cours,
         // on affiche le message de chargement et la pagination du haut
-        return (
-          <div className="BookArea">
-            {pagination}
-            {Books}
-          </div>
-        );
-      } else {
+        <div className="BookArea">
+          {pagination}
+          {Books}
+        </div>
+      ) : (
         // Si il y a des données et pas de requete a l'api en cours on affiche le tout correctement
-        return (
-          <div className="BookArea">
-            {pagination}
-            {Books}
-            {pagination}
-          </div>
-        );
-      }
-    }
-
-    return <div className="BookArea">{Books}</div>;
+        <div className="BookArea">
+          {pagination}
+          {Books}
+          {pagination}
+        </div>
+      )
+    ) : (
+      <div className="BookArea">{Books}</div>
+    );
   }
 }
