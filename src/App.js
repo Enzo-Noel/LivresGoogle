@@ -64,17 +64,17 @@ export default class App extends React.Component {
       this.setState({ requeteApi: newRequeteApi });
       this.setState({ goodResearch: false });
       newRequeteApi.then((researchOfRequete) => {
-        this.setState({ errorRequete: false });
         // Au retour de la requete, si la recherche est la même que celle de la requete
         // on le signale, pour eviter que d'autres requetes intermediaires
         // potentiellement en retard ne modifient les données
         if (researchOfRequete === this.state.research) {
+          this.setState({ errorRequete: false });
           this.setState({ goodResearch: true });
         }
       });
-      newRequeteApi.catch(() => {
-        // Si la bonne requete a echoué, on signale l'erreur
-        if (!this.state.goodResearch) {
+      newRequeteApi.catch((researchOfRequete) => {
+        // On signal l'erreur uniquement si la bonne requete a échoué
+        if (researchOfRequete === this.state.research) {
           this.setState({ errorRequete: true });
         }
       });
