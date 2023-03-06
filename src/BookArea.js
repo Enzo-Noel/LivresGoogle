@@ -8,9 +8,6 @@ export default class BookArea extends React.Component {
   constructor(props) {
     super(props);
     this.changePage = this.changePage.bind(this);
-    this.state = {
-      error: false,
-    };
   }
 
   // Fonction qui change la page
@@ -19,11 +16,11 @@ export default class BookArea extends React.Component {
   }
 
   render() {
-    const data = this.props.data;
     const info = this.props.info;
+    const data = info.data;
     const books = data.items;
-    const error = this.state.error;
-    const requeteApi = this.props.requeteApi;
+    const requeteApi = info.requeteApi;
+    const errorRequete = info.errorRequete;
 
     // La pagination
     const pagination = (
@@ -42,14 +39,7 @@ export default class BookArea extends React.Component {
     if (requeteApi !== undefined) {
       // Tant qu'il y'a une requete en cours, on affiche un message de chargement
       display = <h3>Chargement...</h3>;
-      // On met a jour l'etat de l'erreur
-      requeteApi.then(() => {
-        this.setState({ error: false });
-      });
-      requeteApi.catch(() => {
-        this.setState({ error: true });
-      });
-    } else if (error) {
+    } else if (errorRequete) {
       // Si il y a une erreur avec la requete, on affiche un message
       display = <h3>Une erreur est survenu, veuillez réessayer.</h3>;
     } else if (books !== undefined) {
@@ -60,16 +50,14 @@ export default class BookArea extends React.Component {
     } else if (data.totalItems <= 0) {
       // Si il n'y a pas de livres a la recherche voulu, on affiche un message le spécifiant
       display = (
-        <h3>
-          Aucun ouvrage correspondant à votre recherche : {this.props.research}
-        </h3>
+        <h3>Aucun ouvrage correspondant à votre recherche : {info.research}</h3>
       );
     }
 
     const Books = <div className="Books">{display}</div>;
 
     // Si il n'y a pas d'erreur et qu'il y a des données correctes
-    if (!error && data.totalItems > 0 && data.items !== undefined) {
+    if (!errorRequete && data.totalItems > 0 && data.items !== undefined) {
       if (requeteApi !== undefined) {
         // Si il y a des données précédemment reçu et une requete a l'api en cours,
         // on affiche le message de chargement et la pagination du haut

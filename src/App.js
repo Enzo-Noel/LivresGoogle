@@ -22,6 +22,7 @@ export default class App extends React.Component {
       nbBooks: 10, // Le nombre de livres de base
       requeteApi: undefined, // Une promesse pour la requete a l'api
       goodResearch: false, // Une variable pour savoir si la recherche est bonne
+      errorRequete: false, // Une variable pour savoir si il y a eu une erreur avec la requete
     };
   }
 
@@ -57,17 +58,24 @@ export default class App extends React.Component {
           })
           .catch((error) => {
             console.log(error);
-            reject();
+            reject(newSearch);
           });
       });
       this.setState({ requeteApi: newRequeteApi });
       this.setState({ goodResearch: false });
       newRequeteApi.then((researchOfRequete) => {
+        this.setState({ errorRequete: false });
         // Au retour de la requete, si la recherche est la même que celle de la requete
         // on le signale, pour eviter que d'autres requetes intermediaires
         // potentiellement en retard ne modifient les données
         if (researchOfRequete === this.state.research) {
           this.setState({ goodResearch: true });
+        }
+      });
+      newRequeteApi.catch(() => {
+        // Si la bonne requete a echoué, on signale l'erreur
+        if (!this.state.goodResearch) {
+          this.setState({ errorRequete: true });
         }
       });
       // Au retour de la requete, on remet la requete a undefined
@@ -119,35 +127,22 @@ export default class App extends React.Component {
   // Ici j'éffectue le chargement de la page
   render() {
     const info = this.state;
-    const data = info.data;
-    const nbBooks = info.nbBooks;
-    const research = info.research;
-    const requeteApi = info.requeteApi;
 
     // Les composants
     // Barre de recherche
     const searchBar = (
       <SearchBar
-        nbBooks={nbBooks}
+        nbBooks={info.nbBooks}
         ResetPage={this.resetState}
         SearchChange={this.changeSearch}
         NbBooksChange={this.changeNbBooks}
       />
     );
     // La zone des livres
-    const bookArea = (
-      <BookArea
-        info={info}
-        data={data}
-        nbBooks={nbBooks}
-        research={research}
-        requeteApi={requeteApi}
-        PageChange={this.changePage}
-      />
-    );
+    const bookArea = <BookArea info={info} PageChange={this.changePage} />;
 
     // Si il y a une recherche
-    if (this.state.emptyString.test(research) === false) {
+    if (info.emptyString.test(info.research) === false) {
       return (
         <div className="App">
           {searchBar}
