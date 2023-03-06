@@ -21,6 +21,7 @@ export default class App extends React.Component {
       page: 0, // La page
       nbBooks: 10, // Le nombre de livres de base
       requeteApi: undefined, // Une promesse pour la requete a l'api
+      goodResearch: false, // Une variable pour savoir si la recherche est bonne
     };
   }
 
@@ -48,8 +49,11 @@ export default class App extends React.Component {
         axios
           .get(requete)
           .then((r) => {
-            this.setState({ data: r.data });
-            resolve();
+            // Si la bonne recherche est déja arriver, on ne modifie pas les données
+            if (!this.state.goodResearch) {
+              this.setState({ data: r.data });
+            }
+            resolve(newSearch);
           })
           .catch((error) => {
             console.log(error);
@@ -57,6 +61,15 @@ export default class App extends React.Component {
           });
       });
       this.setState({ requeteApi: newRequeteApi });
+      this.setState({ goodResearch: false });
+      newRequeteApi.then((researchOfRequete) => {
+        // Au retour de la requete, si la recherche est la même que celle de la requete
+        // on le signale, pour eviter que d'autres requetes intermediaires
+        // potentiellement en retard ne modifient les données
+        if (researchOfRequete === this.state.research) {
+          this.setState({ goodResearch: true });
+        }
+      });
       newRequeteApi.finally(() => {
         this.setState({ requeteApi: undefined });
       });
