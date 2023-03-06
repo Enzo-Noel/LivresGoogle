@@ -50,31 +50,39 @@ export default class App extends React.Component {
         axios
           .get(requete)
           .then((r) => {
+            let result = { newSearch, newNbBooks };
             // Si la bonne recherche est déja arriver, on ne modifie pas les données
             if (!this.state.goodResearch) {
               this.setState({ data: r.data });
             }
-            resolve(newSearch);
+            resolve(result);
           })
           .catch((error) => {
+            let result = { newSearch, newNbBooks };
             console.log(error);
-            reject(newSearch);
+            reject(result);
           });
       });
       this.setState({ requeteApi: newRequeteApi });
       this.setState({ goodResearch: false });
-      newRequeteApi.then((researchOfRequete) => {
+      newRequeteApi.then((result) => {
         // Au retour de la requete, si la recherche est la même que celle de la requete
         // on le signale, pour eviter que d'autres requetes intermediaires
         // potentiellement en retard ne modifient les données
-        if (researchOfRequete === this.state.research) {
+        if (
+          result.newSearch === this.state.research &&
+          result.newNbBooks === this.state.nbBooks
+        ) {
           this.setState({ errorRequete: false });
           this.setState({ goodResearch: true });
         }
       });
-      newRequeteApi.catch((researchOfRequete) => {
+      newRequeteApi.catch((result) => {
         // On signal l'erreur uniquement si la bonne requete a échoué
-        if (researchOfRequete === this.state.research) {
+        if (
+          result.newSearch === this.state.research &&
+          result.newNbBooks === this.state.nbBooks
+        ) {
           this.setState({ errorRequete: true });
         }
       });
