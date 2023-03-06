@@ -34,7 +34,7 @@ export default class BookArea extends React.Component {
 
     // message de base, qui dans le cas ou les données reçu ne sont pas correctes, sera affiché
     // Pour certains cas l'api renvoie des données avec un "totalItems" supérieur a 0, mais sans "items"
-    let display = <h3>Données reçu incorrect</h3>;
+    let display = <h3>Données reçues incorrects</h3>;
 
     if (requeteApi !== undefined) {
       // Tant qu'il y'a une requete en cours, on affiche un message de chargement
