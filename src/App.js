@@ -70,6 +70,7 @@ export default class App extends React.Component {
           this.setState({ goodResearch: true });
         }
       });
+      // Au retour de la requete, on remet la requete a undefined
       newRequeteApi.finally(() => {
         this.setState({ requeteApi: undefined });
       });
