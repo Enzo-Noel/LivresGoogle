@@ -16,14 +16,14 @@ export default class App extends React.Component {
     this.resetState = this.resetState.bind(this);
     this.reload = this.reload.bind(this);
     this.state = {
-      emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
-      research: "", // La recherche
-      data: [], // Les données
-      page: 0, // La page
-      nbBooks: 10, // Le nombre de livres de base
+      emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la recherche est vide
+      research: "", // Stockage de la recherche voulu
+      data: [], // Stockage des données
+      page: 0, // Stockage de la page voulu
+      nbBooks: 10, // Stockage du nombre de livres par page voulu
       requeteApi: undefined, // Une promesse pour la requete a l'api
-      goodResearch: false, // Une variable pour savoir si la recherche est bonne
-      errorRequete: false, // Une variable pour savoir si il y a eu une erreur avec la requete
+      goodResearch: false, // Booléen pour savoir si la bonne recherche est arrivé
+      errorRequete: false, // Booléen pour savoir si il y a eu une erreur avec la requete
     };
   }
 
@@ -45,8 +45,8 @@ export default class App extends React.Component {
         let requete =
           "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
           newSearch +
-          "&startIndex=" + // rajouté un - apres le = pour provoquer une erreur et la tester
-          index + // index negatif provoque une erreur
+          "&startIndex=" + // un - apres le =
+          index + // index negatif provoque une erreur et permet de tester le catch
           "&maxResults=" +
           newNbBooks;
         axios
@@ -77,9 +77,9 @@ export default class App extends React.Component {
           .catch((error) => {
             console.log(error);
             console.log(
-              "la requete pour: \n\nRecherche: " +
+              "la requete pour:\n\nRecherche: " +
                 newSearch +
-                "\nLivres par pages: " +
+                "\nLivres par page: " +
                 newNbBooks +
                 "\npage: " +
                 (newPage + 1) +
@@ -100,6 +100,7 @@ export default class App extends React.Component {
       });
       this.setState({ requeteApi: newRequeteApi });
     } else {
+      // Si il y'a une requete en cours, on attend qu'elle soit fini avant de remettre a zero les données
       if (this.state.requeteApi !== undefined) {
         this.state.requeteApi.then(() => {
           this.resetState();
