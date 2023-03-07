@@ -41,7 +41,7 @@ export default class App extends React.Component {
       let index = page * newNbBooks;
       this.setState({ goodResearch: false });
       // Je crée une promesse pour la recherche
-      const newRequeteApi = new Promise((resolve, reject) => {
+      const newRequeteApi = new Promise(() => {
         let requete =
           "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
           newSearch +
@@ -61,7 +61,7 @@ export default class App extends React.Component {
                   newSearch +
                   "\nLivres par pages: " +
                   newNbBooks +
-                  "\n\nest arrivé apres\nla requete voulu: \n\nRecherche: " +
+                  "\n\nest arrivé apres\n\nla requete voulu: \n\nRecherche: " +
                   this.state.research +
                   "\nLivres par pages: " +
                   this.state.nbBooks +
@@ -78,7 +78,7 @@ export default class App extends React.Component {
               this.setState({ errorRequete: false });
               this.setState({ goodResearch: true });
             }
-            resolve(); // necessaire pour que le finally s'éxecute
+            this.setState({ requeteApi: undefined });
           })
           .catch((error) => {
             console.log(error);
@@ -102,13 +102,10 @@ export default class App extends React.Component {
                 "Elle est arrivé apres la requete voulu, elle n'a donc pas été prise en compte"
               );
             }
-            reject(); // necessaire pour que le finally s'éxecute
+            this.setState({ requeteApi: undefined });
           });
       });
       this.setState({ requeteApi: newRequeteApi });
-      newRequeteApi.finally(() => {
-        this.setState({ requeteApi: undefined });
-      });
     } else {
       this.resetState();
     }
@@ -136,7 +133,7 @@ export default class App extends React.Component {
     let correctPage = page; // La page correcte
     // Si le changement du nombre de livre fait que la page actuelle est supérieur au nombre de page
     // possible pour cette configuration, on change la page pour la dernière page possible
-    // et si il on a des livres en données
+    // et si on a des livres en données
     if (newNbBooks * page >= totalItems && totalItems > 0) {
       correctPage = totalItems / newNbBooks - 1;
       correctPage = Math.ceil(correctPage); // On arrondi au supérieur

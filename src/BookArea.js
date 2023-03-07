@@ -26,8 +26,9 @@ export default class BookArea extends React.Component {
     // La pagination
     const pagination = <Pagination info={info} PageChange={this.changePage} />;
 
-    // message de base, qui dans le cas ou les données reçu ne sont pas correctes, sera affiché
+    // Message de base, qui dans le cas ou les données reçu ne sont pas correctes, sera affiché
     // Pour certains cas l'api renvoie des données avec un "totalItems" supérieur a 0, mais sans "items"
+    // Dans ce cas je ne sais pas si il est légitime de permettre a l'utilisateur de faire un retour en arriere.
     let display = <h3 className="displayText">Données reçues incorrects</h3>;
 
     if (requeteApi !== undefined) {
