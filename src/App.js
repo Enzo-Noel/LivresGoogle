@@ -91,16 +91,18 @@ export default class App extends React.Component {
                 newPage +
                 "\n\na échoué"
             );
+            if (this.state.goodResearch) {
+              console.log(
+                "Elle est arrivé apres la requete voulu, elle n'a donc pas été prise en compte"
+              );
+            }
             // On signal l'erreur uniquement si la bonne requete a échoué
             if (
               newSearch === this.state.research &&
               newNbBooks === this.state.nbBooks
             ) {
               this.setState({ errorRequete: true });
-            } else {
-              console.log(
-                "Elle est arrivé apres la requete voulu, elle n'a donc pas été prise en compte"
-              );
+              this.setState({ goodResearch: true });
             }
             this.setState({ requeteApi: undefined });
           });
