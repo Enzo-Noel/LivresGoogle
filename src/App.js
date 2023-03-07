@@ -41,7 +41,7 @@ export default class App extends React.Component {
       let index = page * newNbBooks;
       this.setState({ goodResearch: false });
       // Je crée une promesse pour la recherche
-      const newRequeteApi = new Promise(() => {
+      const newRequeteApi = new Promise((resolve) => {
         let requete =
           "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
           newSearch +
@@ -57,28 +57,22 @@ export default class App extends React.Component {
               this.setState({ data: r.data });
             } else {
               console.log(
-                "La requete pour: \n\nRecherche: " +
+                "La requete: " +
                   newSearch +
-                  "\nLivres par pages: " +
-                  newNbBooks +
-                  "\n\nest arrivé apres\n\nla requete voulu: \n\nRecherche: " +
+                  "\n\nest arrivé apres\n\nla requete voulu: " +
                   this.state.research +
-                  "\nLivres par pages: " +
-                  this.state.nbBooks +
-                  "\n\nelle n'a donc pas été pris en compte"
+                  "\n\nelle n'a donc pas été prise en compte"
               );
             }
             // Au retour de la requete, si la recherche est la même que celle de la requete
             // on le signale, pour eviter que d'autres requetes intermediaires
             // potentiellement en retard ne modifient les données
-            if (
-              newSearch === this.state.research &&
-              newNbBooks === this.state.nbBooks
-            ) {
+            if (newSearch === this.state.research) {
               this.setState({ errorRequete: false });
               this.setState({ goodResearch: true });
             }
             this.setState({ requeteApi: undefined });
+            resolve();
           })
           .catch((error) => {
             console.log(error);
@@ -88,7 +82,7 @@ export default class App extends React.Component {
                 "\nLivres par pages: " +
                 newNbBooks +
                 "\npage: " +
-                newPage +
+                (newPage + 1) +
                 "\n\na échoué"
             );
             if (this.state.goodResearch) {
@@ -97,10 +91,7 @@ export default class App extends React.Component {
               );
             }
             // On signal l'erreur uniquement si la bonne requete a échoué
-            if (
-              newSearch === this.state.research &&
-              newNbBooks === this.state.nbBooks
-            ) {
+            if (newSearch === this.state.research) {
               this.setState({ errorRequete: true });
               this.setState({ goodResearch: true });
             }
@@ -109,7 +100,13 @@ export default class App extends React.Component {
       });
       this.setState({ requeteApi: newRequeteApi });
     } else {
-      this.resetState();
+      if (this.state.requeteApi !== undefined) {
+        this.state.requeteApi.then(() => {
+          this.resetState();
+        });
+      } else {
+        this.resetState();
+      }
     }
   }
 
@@ -162,7 +159,6 @@ export default class App extends React.Component {
     // Barre de recherche
     const searchBar = (
       <SearchBar
-        nbBooks={info.nbBooks}
         ResetPage={this.resetState}
         SearchChange={this.changeSearch}
         NbBooksChange={this.changeNbBooks}

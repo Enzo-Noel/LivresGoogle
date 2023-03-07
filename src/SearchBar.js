@@ -9,15 +9,23 @@ export default class SearchBar extends React.Component {
     this.handleSearch = this.handleSearch.bind(this);
     this.handleNbBooks = this.handleNbBooks.bind(this);
     this.handleReset = this.handleReset.bind(this);
+    this.setNbBooks = this.setNbBooks.bind(this);
+    this.state = {
+      nbBooks: 10,
+    };
   }
 
   // Permet la récupération des paramètres de recherche et les envoie au composant parent (App.js)
   handleSearch(e) {
     this.props.SearchChange(e.target.value);
   }
-  handleNbBooks(e) {
-    this.props.NbBooksChange(e.target.value);
+  handleNbBooks() {
+    this.props.NbBooksChange(this.state.nbBooks);
   }
+  setNbBooks(e) {
+    this.setState({ nbBooks: e.target.value });
+  }
+
   handleReset() {
     const searchInput = document.querySelector(".searchInput");
     searchInput.value = "";
@@ -42,14 +50,15 @@ export default class SearchBar extends React.Component {
           </div>
           <div className="nbBooks">
             <label className="nbBooksLabel" htmlFor="nbBooks">
-              Livres par pages : {this.props.nbBooks}
+              Livres par pages : {this.state.nbBooks}
             </label>
             <input
               name="nbBooks"
               className="nbBooksInput"
               type="range"
-              onChange={this.handleNbBooks}
-              value={this.props.nbBooks}
+              onPointerUp={this.handleNbBooks}
+              onChange={this.setNbBooks}
+              value={this.state.nbBooks}
               step="1"
               min="1"
               max="40"

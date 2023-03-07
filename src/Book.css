@@ -65,6 +65,9 @@
     padding-left: 10px;
     padding-right: 10px;
   }
+  .title a:hover {
+    color: cornsilk;
+  }
 }
 
 @media screen and (max-width: 400px) {
