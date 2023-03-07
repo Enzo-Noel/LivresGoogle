@@ -21,43 +21,52 @@ export default class BookArea extends React.Component {
     const books = data.items;
     const requeteApi = info.requeteApi;
     const errorRequete = info.errorRequete;
+    const totalItems = data.totalItems;
 
     // La pagination
-    const pagination = (
-      <Pagination
-        data={data}
-        page={info.page}
-        nbBooks={info.nbBooks}
-        PageChange={this.changePage}
-      />
-    );
+    const pagination = <Pagination info={info} PageChange={this.changePage} />;
 
     // message de base, qui dans le cas ou les données reçu ne sont pas correctes, sera affiché
     // Pour certains cas l'api renvoie des données avec un "totalItems" supérieur a 0, mais sans "items"
-    let display = <h3>Données reçues incorrects</h3>;
+    let display = <h3 className="displayText">Données reçues incorrects</h3>;
 
     if (requeteApi !== undefined) {
       // Tant qu'il y'a une requete en cours, on affiche un message de chargement
-      display = <h3>Chargement...</h3>;
+      display = <h3 className="displayText">Chargement...</h3>;
     } else if (errorRequete) {
       // Si il y a une erreur avec la requete, on affiche un message
-      display = <h3>Une erreur est survenu, veuillez réessayer.</h3>;
+      display = (
+        <div className="display">
+          <h3 className="displayText">
+            Une erreur est survenu, veuillez réessayer.
+          </h3>
+          <button
+            className="btnReload"
+            type="button"
+            onClick={this.props.Reload}
+          >
+            Réessayer
+          </button>
+        </div>
+      );
     } else if (books !== undefined) {
       // Si il y a des livres, on les affiches
       display = books.map((book) => {
         return <Book key={book.id} book={book} />;
       });
-    } else if (data.totalItems <= 0) {
+    } else if (totalItems <= 0) {
       // Si il n'y a pas de livres a la recherche voulu, on affiche un message le spécifiant
       display = (
-        <h3>Aucun ouvrage correspondant à votre recherche : {info.research}</h3>
+        <h3 className="displayText">
+          Aucun ouvrage correspondant à votre recherche : {info.research}
+        </h3>
       );
     }
 
     const Books = <div className="Books">{display}</div>;
 
     // Si il n'y a pas d'erreur et qu'il y a des données correctes
-    return !errorRequete && data.totalItems > 0 && data.items !== undefined ? (
+    return !errorRequete && totalItems > 0 && data.items !== undefined ? (
       requeteApi !== undefined ? (
         // Si il y a des données précédemment reçu et une requete a l'api en cours,
         // on affiche le message de chargement et la pagination du haut

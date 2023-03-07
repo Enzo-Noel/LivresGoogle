@@ -14,6 +14,7 @@ export default class App extends React.Component {
     this.changeNbBooks = this.changeNbBooks.bind(this);
     this.changePage = this.changePage.bind(this);
     this.resetState = this.resetState.bind(this);
+    this.reload = this.reload.bind(this);
     this.state = {
       emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la chaine est vide
       research: "", // La recherche
@@ -38,6 +39,7 @@ export default class App extends React.Component {
         this.setState({ page: page });
       }
       let index = page * newNbBooks;
+      this.setState({ goodResearch: false });
       // Je crée une promesse pour la recherche
       const newRequeteApi = new Promise((resolve, reject) => {
         let requete =
@@ -50,43 +52,60 @@ export default class App extends React.Component {
         axios
           .get(requete)
           .then((r) => {
-            let result = { newSearch, newNbBooks };
             // Si la bonne recherche est déja arriver, on ne modifie pas les données
             if (!this.state.goodResearch) {
               this.setState({ data: r.data });
+            } else {
+              console.log(
+                "La requete pour: \n\nRecherche: " +
+                  newSearch +
+                  "\nLivres par pages: " +
+                  newNbBooks +
+                  "\n\nest arrivé apres\nla requete voulu: \n\nRecherche: " +
+                  this.state.research +
+                  "\nLivres par pages: " +
+                  this.state.nbBooks +
+                  "\n\nelle n'a donc pas été pris en compte"
+              );
             }
-            resolve(result);
+            // Au retour de la requete, si la recherche est la même que celle de la requete
+            // on le signale, pour eviter que d'autres requetes intermediaires
+            // potentiellement en retard ne modifient les données
+            if (
+              newSearch === this.state.research &&
+              newNbBooks === this.state.nbBooks
+            ) {
+              this.setState({ errorRequete: false });
+              this.setState({ goodResearch: true });
+            }
+            resolve(); // necessaire pour que le finally s'éxecute
           })
           .catch((error) => {
-            let result = { newSearch, newNbBooks };
             console.log(error);
-            reject(result);
+            console.log(
+              "la requete pour: \n\nRecherche: " +
+                newSearch +
+                "\nLivres par pages: " +
+                newNbBooks +
+                "\npage: " +
+                newPage +
+                "\n\na échoué"
+            );
+            // On signal l'erreur uniquement si la bonne requete a échoué
+            if (
+              newSearch === this.state.research &&
+              newNbBooks === this.state.nbBooks
+            ) {
+              this.setState({ errorRequete: true });
+            } else {
+              console.log(
+                "Elle est arrivé apres la requete voulu, elle n'a donc pas été prise en compte"
+              );
+            }
+            reject(); // necessaire pour que le finally s'éxecute
           });
       });
       this.setState({ requeteApi: newRequeteApi });
-      this.setState({ goodResearch: false });
-      newRequeteApi.then((result) => {
-        // Au retour de la requete, si la recherche est la même que celle de la requete
-        // on le signale, pour eviter que d'autres requetes intermediaires
-        // potentiellement en retard ne modifient les données
-        if (
-          result.newSearch === this.state.research &&
-          result.newNbBooks === this.state.nbBooks
-        ) {
-          this.setState({ errorRequete: false });
-          this.setState({ goodResearch: true });
-        }
-      });
-      newRequeteApi.catch((result) => {
-        // On signal l'erreur uniquement si la bonne requete a échoué
-        if (
-          result.newSearch === this.state.research &&
-          result.newNbBooks === this.state.nbBooks
-        ) {
-          this.setState({ errorRequete: true });
-        }
-      });
-      // Au retour de la requete, on remet la requete a undefined
       newRequeteApi.finally(() => {
         this.setState({ requeteApi: undefined });
       });
@@ -132,6 +151,10 @@ export default class App extends React.Component {
     this.search(this.state.research, newPage, this.state.nbBooks);
   }
 
+  reload() {
+    this.search(this.state.research, this.state.page, this.state.nbBooks);
+  }
+
   // Ici j'éffectue le chargement de la page
   render() {
     const info = this.state;
@@ -147,7 +170,9 @@ export default class App extends React.Component {
       />
     );
     // La zone des livres
-    const bookArea = <BookArea info={info} PageChange={this.changePage} />;
+    const bookArea = (
+      <BookArea info={info} PageChange={this.changePage} Reload={this.reload} />
+    );
 
     // Si il y a une recherche
     return info.emptyString.test(info.research) === false ? (
