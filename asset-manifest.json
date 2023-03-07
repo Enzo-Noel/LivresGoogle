@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/LivresGoogle/static/css/main.0d465d43.css",
-    "main.js": "/LivresGoogle/static/js/main.169a26ab.js",
+    "main.js": "/LivresGoogle/static/js/main.b31a83d6.js",
     "static/js/787.4b4033a3.chunk.js": "/LivresGoogle/static/js/787.4b4033a3.chunk.js",
     "static/media/bookEmpty.png": "/LivresGoogle/static/media/bookEmpty.680672d9415817acce72.png",
     "index.html": "/LivresGoogle/index.html",
     "main.0d465d43.css.map": "/LivresGoogle/static/css/main.0d465d43.css.map",
-    "main.169a26ab.js.map": "/LivresGoogle/static/js/main.169a26ab.js.map",
+    "main.b31a83d6.js.map": "/LivresGoogle/static/js/main.b31a83d6.js.map",
     "787.4b4033a3.chunk.js.map": "/LivresGoogle/static/js/787.4b4033a3.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.0d465d43.css",
-    "static/js/main.169a26ab.js"
+    "static/js/main.b31a83d6.js"
   ]
 }
