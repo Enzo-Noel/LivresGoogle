@@ -54,7 +54,7 @@
 .nbBooksInput {
   width: 100%;
   padding: 0;
-  margin: 0;
+  margin: 5px 0 0 0;
 }
 
 h1,
@@ -79,6 +79,12 @@ label {
   }
   .nbBooksInput {
     width: 80%;
-    margin-top: 5px;
+  }
+
+  .searchInput,
+  .searchInput::placeholder {
+    font-size: 0.8rem;
+    width: 170px;
+    height: 18px;
   }
 }
