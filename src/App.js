@@ -34,7 +34,6 @@ export default class App extends React.Component {
   // Ici j'éffectue la requete en fonction de la suite de la recherche entrée,
   // de la page et du nombre de livre a afficher.
   search(newSearch, newPage, newNbBooks) {
-    this.setState({ loading: false });
     this.setState({ goodResearch: false });
     // Si il y a une suite de caractere non vide, on effectue la recherche
     if (this.state.emptyString.test(newSearch) === false) {
@@ -173,18 +172,24 @@ export default class App extends React.Component {
   // tandis que l'autre qui est dans la requete directement permet de ne pas prendre
   // en compte les données d'une requete si elle arrive apres la bonne requete souhaité
   requestDelay(research, page, nbBooks) {
+    // si la recherche change, on remet a zero les données pour permettre a l'affichage de bien afficher le chargement sans la pagination
     if (research !== this.state.oldResearch) {
       this.setState({ data: [] });
     }
+    // Si on est pas en train de charger, on lance le chargement pré requetes pour eviter le spam
     if (!this.state.loading) {
       this.setState({ loading: true });
     }
+    // si il y'a le loading pré requete, on le supprime
     if (this.state.timeBeforeRequest !== undefined && this.state.loading) {
       clearTimeout(this.state.timeBeforeRequest);
     }
     this.setState({
       timeBeforeRequest: setTimeout(() => {
         this.search(research, page, nbBooks);
+        this.setState({ loading: false });
+        this.setState({ timeBeforeRequest: undefined });
+        this.setState({});
       }, 200),
     });
   }
