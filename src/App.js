@@ -49,7 +49,7 @@ export default class App extends React.Component {
         let request =
           "https://www.googleapis.com/books/v1/volumes?q=inauthor:" +
           newSearch +
-          "&startIndex=-" + // un - apres le =
+          "&startIndex=" + // un - apres le =
           index + // index negatif provoque une erreur et permet de tester le catch
           "&maxResults=" +
           newNbBooks;
@@ -160,13 +160,13 @@ export default class App extends React.Component {
     this.setState({ page: newPage });
     // Meme logique que pour la recheche, cette fonction a été ecrite pour eviter de spammer les requetes
     // si l'utilisateur clique trop vite sur les boutons de pagination
-    this.requestDelay(this.state.research, newPage, this.state.nbBooks, 250);
+    this.requestDelay(this.state.research, newPage, this.state.nbBooks, 200);
   }
 
   // Si l'utilisateur est en train d'écrire ou si il change de page trop vite,
   // on ne lance pas la requete, ça permet d'éviter de spammer les requetes.
   // si le temps entre deux lettres est inférieur à 150ms
-  // ou si le temps entre deux changement de page est inférieur à 250ms on patiente.
+  // ou si le temps entre deux changement de page est inférieur à 200ms on patiente.
   // J'ai ecris ce "code" bien apres avoir fait mon systeme gérant les requetes en retard, ce qui en sois fait doublon
   // mais je préfère garder les deux car celui-ci permet d'éviter de lancer des requetes inutiles
   // tandis que l'autre qui est dans la requete directement permet de ne pas prendre
