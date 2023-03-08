@@ -19,9 +19,10 @@ export default class BookArea extends React.Component {
     const info = this.props.info;
     const data = info.data;
     const books = data.items;
+    const totalItems = data.totalItems;
     const requestApi = info.requestApi;
     const errorRequest = info.errorRequest;
-    const totalItems = data.totalItems;
+
     const loading = info.loading;
 
     // La pagination

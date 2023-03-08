@@ -59,7 +59,7 @@ export default class App extends React.Component {
           .get(request)
           .then((r) => {
             // Si la bonne recherche est déja arriver, on ne modifie pas les données
-            if (!this.state.goodResearch) {
+            if (!this.state.goodResearch && !this.state.loading) {
               this.setState({ data: r.data });
             } else {
               console.log(
