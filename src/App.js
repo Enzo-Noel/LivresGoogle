@@ -174,8 +174,6 @@ export default class App extends React.Component {
   // en compte les données d'une requete si elle arrive apres la bonne requete souhaité
   requestDelay(research, page, nbBooks) {
     if (research !== this.state.oldResearch) {
-      console.log(research);
-      console.log(this.state.oldResearch);
       this.setState({ data: [] });
     }
     if (!this.state.loading) {
