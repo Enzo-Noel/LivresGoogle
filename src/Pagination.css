@@ -34,15 +34,6 @@ h5 {
 }
 
 @media screen and (max-width: 1200px) {
-  .Pagination .button::after {
-    display: block;
-    text-indent: 0;
-    line-height: initial;
-  }
-  .Pagination .button {
-    text-indent: -9999px;
-    line-height: 0;
-  }
   .Pagination .button:hover {
     color: aliceblue;
   }
@@ -60,6 +51,15 @@ h5 {
 }
 
 @media screen and (max-width: 400px) {
+  .Pagination .button::after {
+    display: block;
+    text-indent: 0;
+    line-height: initial;
+  }
+  .Pagination .button {
+    text-indent: -9999px;
+    line-height: 0;
+  }
   .Pagination * {
     font-size: 1rem;
   }
