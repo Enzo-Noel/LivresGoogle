@@ -37,9 +37,6 @@ h5 {
   .Pagination .button:hover {
     color: aliceblue;
   }
-  .Pagination {
-    padding: 1rem 0rem 1rem 0;
-  }
 
   .Pagination * {
     font-size: 1.3rem;
