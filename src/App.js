@@ -18,6 +18,7 @@ export default class App extends React.Component {
     this.state = {
       emptyString: new RegExp("^[ ]*$"), // Une expression régulière pour vérifier si la recherche est vide
       research: "", // Stockage de la recherche voulu
+      oldResearch: "", // Stockage de la recherche précedente
       data: [], // Stockage des données
       page: 0, // Stockage de la page voulu
       nbBooks: 10, // Stockage du nombre de livres par page voulu
@@ -39,11 +40,12 @@ export default class App extends React.Component {
     if (this.state.emptyString.test(newSearch) === false) {
       let page = newPage;
       // Si la recherche change par rapport a la recherche précedente, on revient à la page 0
-      if (newSearch !== this.state.research) {
+      if (newSearch !== this.state.oldResearch) {
         page = 0;
         this.setState({ page: page });
       }
       let index = page * newNbBooks;
+      this.setState({ oldResearch: newSearch });
       // Je crée une promesse pour la recherche
       const newRequeteApi = new Promise((resolve) => {
         let request =
@@ -135,7 +137,7 @@ export default class App extends React.Component {
   // Ici j'éffectue le changement de recherche
   changeSearch(newSearch) {
     this.setState({ research: newSearch });
-    this.requestDelay(newSearch, this.state.page, this.state.nbBooks, 150);
+    this.requestDelay(newSearch, this.state.page, this.state.nbBooks);
   }
 
   // Ici j'éffectue le changement du nombre de livres affichés
@@ -160,18 +162,22 @@ export default class App extends React.Component {
     this.setState({ page: newPage });
     // Meme logique que pour la recheche, cette fonction a été ecrite pour eviter de spammer les requetes
     // si l'utilisateur clique trop vite sur les boutons de pagination
-    this.requestDelay(this.state.research, newPage, this.state.nbBooks, 200);
+    this.requestDelay(this.state.research, newPage, this.state.nbBooks);
   }
 
   // Si l'utilisateur est en train d'écrire ou si il change de page trop vite,
   // on ne lance pas la requete, ça permet d'éviter de spammer les requetes.
-  // si le temps entre deux lettres est inférieur à 150ms
-  // ou si le temps entre deux changement de page est inférieur à 200ms on patiente.
+  // si le temps entre deux lettres ou si le temps entre deux changement de page est inférieur à 200ms on patiente.
   // J'ai ecris ce "code" bien apres avoir fait mon systeme gérant les requetes en retard, ce qui en sois fait doublon
   // mais je préfère garder les deux car celui-ci permet d'éviter de lancer des requetes inutiles
   // tandis que l'autre qui est dans la requete directement permet de ne pas prendre
   // en compte les données d'une requete si elle arrive apres la bonne requete souhaité
-  requestDelay(research, page, nbBooks, delay) {
+  requestDelay(research, page, nbBooks) {
+    if (research !== this.state.oldResearch) {
+      console.log(research);
+      console.log(this.state.oldResearch);
+      this.setState({ data: [] });
+    }
     if (!this.state.loading) {
       this.setState({ loading: true });
     }
@@ -181,7 +187,7 @@ export default class App extends React.Component {
     this.setState({
       timeBeforeRequest: setTimeout(() => {
         this.search(research, page, nbBooks);
-      }, delay),
+      }, 200),
     });
   }
 
